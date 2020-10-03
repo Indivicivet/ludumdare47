@@ -306,6 +306,10 @@ end
 
 function spawn_egg()
 	-- used if egg timer runs out or if clear all eggs
+	next_egg_timer = NEXT_EGG_TIME * (1 + love.math.randomNormal(0.1, 0))
+	if not conveyor_moving then
+		return
+	end
 	if #basket_eggs > 0 then
 		spawned_eggs[#spawned_eggs + 1] = {
 			eggtype=basket_eggs[1],
@@ -314,7 +318,6 @@ function spawn_egg()
 			vdown=0,
 		}
 		table.remove(basket_eggs, 1)
-		next_egg_timer = NEXT_EGG_TIME * (1 + love.math.randomNormal(0.1, 0))
 	end
 end
 
