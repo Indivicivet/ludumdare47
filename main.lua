@@ -137,11 +137,6 @@ function reset_game()
 	conveyor_reset_timer = 0
 end
 
-function draw_cursor()
-	mouse_x, mouse_y = love.mouse.getPosition()
-	love.graphics.draw(CURSOR, mouse_x, mouse_y)
-end
-
 function love.draw()
 	if not started then
 		-- splash screen
@@ -259,7 +254,11 @@ function love.draw()
 	love.graphics.print("loops cleared: " .. loops_cleared, 800, text_d_y)
 	
 	-- mouse
-	draw_cursor()
+	mouse_x, mouse_y = love.mouse.getPosition()
+	if love.mouse.isDown(1) then
+		mouse_y = mouse_y + 5
+	end
+	love.graphics.draw(CURSOR, mouse_x, mouse_y)
 end
 
 function love.update(dt)
