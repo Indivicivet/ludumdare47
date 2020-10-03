@@ -46,6 +46,9 @@ function love.load()
 		click_egg={
 			str="click the egg!",
 		},
+		click_next_egg={
+			str="click the next egg after the current one!",
+		},
 	}
 	STATUS = {not_done=0, current=1, done=2}
 	TASK_STATUS_COLOURS = {
@@ -72,11 +75,11 @@ function reset_task_progress()
 	end
 	tasks[1].status = STATUS.current
 	current_task_idx = 1
+	complete_current_task_if_free()
 end
 
 function reset_game()
-	tasks = {{tasktype=TASK_TYPES.click_egg}, {tasktype=TASK_TYPES.click_egg}}
-	reset_task_progress()
+	tasks = {{tasktype=TASK_TYPES.click_next_egg}, {tasktype=TASK_TYPES.click_egg}}
 	
 	spawned_eggs = {}
 	t = 0
@@ -88,6 +91,7 @@ function reset_game()
 		basket_eggs[#basket_eggs + 1] = EGG_TYPES[i]
 	end
 	
+	reset_task_progress() -- must call after defining eggs :)
 	started = true
 end
 
@@ -197,11 +201,22 @@ function love.update(dt)
 	end
 end
 
+function complete_current_task_if_free()
+	-- call this when we reset tasks or complete_task()s
+	-- some tasks we want to complete for free:
+	if tasks[current_task_idx].tasktype == TASK_TYPES.click_next_egg then
+		if #spawned_eggs + #basket_eggs < 2 then
+			complete_task()
+		end
+	end
+end
+
 function complete_task()
 	tasks[current_task_idx].status = STATUS.done
 	current_task_idx = current_task_idx + 1
 	if current_task_idx <= #tasks then
 		tasks[current_task_idx].status = STATUS.current
+		complete_current_task_if_free()
 		return
 	end
 	-- we finished an egg!
@@ -234,6 +249,13 @@ function love.mousepressed(x, y, button, istouch, presses)
 	end
 	if tasks[current_task_idx].tasktype == TASK_TYPES.click_egg then
 		if is_in_egg(spawned_eggs[1], x, y) then
+			complete_task()
+		end
+	elseif tasks[current_task_idx].tasktype == TASK_TYPES.click_next_egg then
+		if #spawned_eggs < 2 then
+			return
+		end
+		if is_in_egg(spawned_eggs[2], x, y)	then
 			complete_task()
 		end
 	end
