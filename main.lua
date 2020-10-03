@@ -17,9 +17,9 @@ function love.load()
 		{col="red", striped=true, sprite_name="egg_red_striped"},
 		{col="gold", striped=false, sprite_name="egg_golden"},
 	}
-	for i, eggtype_info in ipairs(EGG_TYPES) do
-		eggtype_info["sprite"] = love.graphics.newImage(
-			"graphics/" .. eggtype_info["sprite_name"] .. ".png"
+	for i, eggtype in ipairs(EGG_TYPES) do
+		eggtype["sprite"] = love.graphics.newImage(
+			"graphics/" .. eggtype["sprite_name"] .. ".png"
 		)
 	end
 	EGG_SPRITE_BOT = {x=62, y=110}
@@ -48,6 +48,9 @@ function love.load()
 		},
 		click_next_egg={
 			str="click the next egg after the current one!",
+		},
+		click_any_xcol={
+			str="click any % egg!",
 		},
 	}
 	STATUS = {not_done=0, current=1, done=2}
@@ -79,7 +82,13 @@ function reset_task_progress()
 end
 
 function reset_game()
-	tasks = {{tasktype=TASK_TYPES.click_next_egg}, {tasktype=TASK_TYPES.click_egg}}
+	tasks = {
+		{tasktype=TASK_TYPES.click_any_xcol, col="blue"},
+		{tasktype=TASK_TYPES.click_any_xcol, col="green"},
+		{tasktype=TASK_TYPES.click_any_xcol, col="red"},
+		{tasktype=TASK_TYPES.click_next_egg},
+		{tasktype=TASK_TYPES.click_egg},
+	}
 	
 	spawned_eggs = {}
 	t = 0
@@ -208,6 +217,16 @@ function complete_current_task_if_free()
 		if #spawned_eggs + #basket_eggs < 2 then
 			complete_task()
 		end
+	elseif tasks[current_task_idx].tasktype == TASK_TYPES.click_any_xcol then
+		exists = false
+		for i, egg in ipairs(spawned_eggs) do
+			if egg.eggtype.col == tasks[current_task_idx].col then
+				exists = true
+			end
+		end
+		if not exists then
+			complete_task()
+		end
 	end
 end
 
@@ -247,17 +266,25 @@ function love.mousepressed(x, y, button, istouch, presses)
 	if #spawned_eggs == 0 then
 		return
 	end
-	if tasks[current_task_idx].tasktype == TASK_TYPES.click_egg then
+	current_task = tasks[current_task_idx]
+	if current_task.tasktype == TASK_TYPES.click_egg then
 		if is_in_egg(spawned_eggs[1], x, y) then
 			complete_task()
 		end
-	elseif tasks[current_task_idx].tasktype == TASK_TYPES.click_next_egg then
+	elseif current_task.tasktype == TASK_TYPES.click_next_egg then
 		if #spawned_eggs < 2 then
 			return
 		end
 		if is_in_egg(spawned_eggs[2], x, y)	then
 			complete_task()
 		end
+	elseif current_task.tasktype == TASK_TYPES.click_any_xcol then
+		for i, egg in ipairs(spawned_eggs) do
+			if egg.eggtype.col == current_task.col and is_in_egg(egg, x, y) then
+				complete_task()
+			end
+		end
+		
 	end
 end
 
