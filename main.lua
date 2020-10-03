@@ -24,6 +24,18 @@ function love.load()
 	end
 	EGG_SPRITE_BOT = {x=62, y=110}
 	
+	EGG_HITBOX_IMGDATA = love.image.newImageData("graphics/egg_hitbox.png")
+	EGG_HITBOX_WIDTH = EGG_HITBOX_IMGDATA:getWidth()
+	EGG_HITBOX_HEIGHT = EGG_HITBOX_IMGDATA:getHeight()
+	EGG_HITBOX = {}
+	for y = 1, EGG_HITBOX_HEIGHT do
+		EGG_HITBOX[y] = {}
+		for x = 1, EGG_HITBOX_WIDTH do
+			r, g, b, a = EGG_HITBOX_IMGDATA:getPixel(x - 1, y - 1)
+			EGG_HITBOX[y][x] = a > 0
+		end
+	end
+	
 	TRASH_CAN = love.graphics.newImage("graphics/trash_can.png")
 	TRASH_SPRITE_MID = {x=64, y=66}
 	
@@ -181,7 +193,24 @@ function love.update(dt)
 end
 
 
+function is_in_egg(egg, x, y)
+	rel = {x=x - (egg.x - EGG_SPRITE_BOT.x), y=y- (egg.y - EGG_SPRITE_BOT.y)}
+	if (
+		rel.x < 0 or rel.x > EGG_HITBOX_WIDTH
+		or rel.y < 0 or rel.y > EGG_HITBOX_HEIGHT
+	) then
+		return false
+	end
+	return EGG_HITBOX[math.floor(rel.y)][math.floor(rel.x)]
+end
+
+
 function love.mousepressed(x, y, button, istouch, presses)
+	for i, egg in ipairs(spawned_eggs) do
+		if is_in_egg(egg, x, y) then
+			--reset_game() -- debug
+		end
+	end
 	if not started then
 		reset_game()
 	end
