@@ -556,6 +556,10 @@ function love.keypressed(key, scancode, isrepeat)
 		love.event.quit()
 	end
 	
+	if not started then
+		return
+	end
+	
 	if current_task.tasktype == TASK_TYPES.keyseq then
 		if current_task.progress == nil then
 			current_task.progress = 0
