@@ -304,12 +304,12 @@ function love.draw()
 	-- status gui
 	love.graphics.setColor(1, 1, 1)
 	love.graphics.setFont(BASE_FONT)
-	text_d_y = 20
-	love.graphics.print("eggs lost: " .. eggs_lost, 800, text_d_y)
+	text_d_y = 150
+	love.graphics.print("eggs lost: " .. eggs_lost, 900, text_d_y)
 	text_d_y = text_d_y + BASE_FONTSIZE * 1.25
-	love.graphics.print("eggs cleared: " .. eggs_cleared, 800, text_d_y)
+	love.graphics.print("eggs cleared: " .. eggs_cleared, 900, text_d_y)
 	text_d_y = text_d_y + BASE_FONTSIZE * 1.25
-	love.graphics.print("loops cleared: " .. loops_cleared, 800, text_d_y)
+	love.graphics.print("loops cleared: " .. loops_cleared, 900, text_d_y)
 	
 	-- mouse
 	draw_cursor()
