@@ -40,6 +40,10 @@ function love.load()
 	
 	TRASH_CAN = love.graphics.newImage("graphics/trash_can.png")
 	TRASH_SPRITE_MID = {x=64, y=66}
+
+	BASKET_FRONT = love.graphics.newImage("graphics/basket_front.png")
+	BASKET_BACK = love.graphics.newImage("graphics/basket_back.png")
+	BASKET_TOP_MID = {x=63, y=40}
 	
 	CURSOR = love.graphics.newImage("graphics/cursor.png")
 	love.mouse.setVisible(false)
@@ -223,13 +227,18 @@ function love.draw()
 		140 - TRASH_SPRITE_MID.x,
 		EGG_Y + EGG_MAXFALL - TRASH_SPRITE_MID.y
 	)
+	basket_x = 1180
+	basket_y = EGG_Y - 150
+	love.graphics.draw(BASKET_BACK, basket_x - BASKET_TOP_MID.x, basket_y - BASKET_TOP_MID.y)
+	love.graphics.setFont(HUGE_FONT)
+	love.graphics.setColor(1, 1, 1)
+	love.graphics.printf(#basket_eggs, basket_x - 50, basket_y - 45, 100, "center")
+	love.graphics.draw(BASKET_FRONT, basket_x - BASKET_TOP_MID.x, basket_y - BASKET_TOP_MID.y)
 	
 	-- status gui
 	love.graphics.setColor(1, 1, 1)
 	love.graphics.setFont(BASE_FONT)
 	text_d_y = 10
-	love.graphics.print("eggs left in basket: " .. #basket_eggs, 800, text_d_y)
-	text_d_y = text_d_y + BASE_FONTSIZE * 1.2
 	love.graphics.print("eggs lost: " .. eggs_lost, 800, text_d_y)
 	text_d_y = text_d_y + BASE_FONTSIZE * 1.2
 	love.graphics.print("eggs cleared: " .. eggs_cleared, 800, text_d_y)
