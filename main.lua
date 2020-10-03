@@ -207,6 +207,9 @@ function complete_task()
 	-- we finished an egg!
 	table.remove(spawned_eggs, 1)
 	reset_task_progress()
+	if #spawned_eggs == 0 and #basket_eggs == 0 then
+		started = false -- temp while we don't have more tasks etc!
+	end
 end
 
 
