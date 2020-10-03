@@ -130,6 +130,9 @@ function reset_game()
 	
 	reset_task_progress() -- must call after defining eggs :)
 	started = true
+	
+	conveyor_moving = true
+	conveyor_reset_timer = 0
 end
 
 function draw_cursor()
@@ -269,6 +272,24 @@ function love.update(dt)
 		end
 	end
 	
+	for i, event_msg in ipairs(event_msgs) do
+		if event_msg.t == nil then
+			event_msg.t = 0
+		end
+		event_msg.t = event_msg.t + dt
+		if event_msg.t > 1 then
+			table.remove(event_msgs, i)
+		end
+	end
+	
+	-- move eggs; first we block on the conveyor being active
+	if not conveyor_moving then
+		conveyor_reset_timer = conveyor_reset_timer - dt
+		if conveyor_reset_timer > 0 then
+			return
+		end
+		conveyor_moving = true
+	end
 	for i, egg in ipairs(spawned_eggs) do
 		egg.x = egg.x - CONVEYOR_SPEED * dt - love.math.randomNormal(20, 0) * dt
 		if egg.x < 200 then
@@ -278,18 +299,10 @@ function love.update(dt)
 				eggs_lost = eggs_lost + 1
 				table.remove(spawned_eggs, i)
 				event_msgs[#event_msgs + 1] = {str="egg failed!", col={1, 0.3, 0.3}}
+				conveyor_moving = false
+				conveyor_reset_timer = 1
 				reset_task_progress()
 			end
-		end
-	end
-	
-	for i, event_msg in ipairs(event_msgs) do
-		if event_msg.t == nil then
-			event_msg.t = 0
-		end
-		event_msg.t = event_msg.t + dt
-		if event_msg.t > 1 then
-			table.remove(event_msgs, i)
 		end
 	end
 end
