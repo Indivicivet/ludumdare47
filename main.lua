@@ -88,6 +88,7 @@ end
 
 function love.draw()
 	love.graphics.setFont(BASE_FONT)
+	-- tasks
 	love.graphics.setColor(1, 1, 1)
 	text_d_x = 40
 	text_d_y = 10
@@ -101,11 +102,19 @@ function love.draw()
 			love.graphics.print(">", text_d_x - 25, text_d_y)
 		end
 	end
+	
+	-- sprites
 	love.graphics.setColor(1, 1, 1)
 	for i, egg in ipairs(spawned_eggs) do
 		love.graphics.draw(egg.eggtype.sprite, egg.x, egg.y)
 	end
 	love.graphics.draw(TRASH_CAN, 160, EGG_Y + EGG_MAXFALL)
+	-- placeholder conveyor:
+	love.graphics.setColor(0.5, 0.5, 0.5)
+	love.graphics.rectangle("fill", 300, EGG_Y + 120, 900, 30, 15, 15)
+	
+	-- status gui
+	love.graphics.setColor(1, 1, 1)
 	love.graphics.print("eggs left in basket: " .. #basket_eggs, 800, 10)
 	love.graphics.print("eggs lost: " .. eggs_lost, 800, 10 + BASE_FONTSIZE*1.2)
 end
