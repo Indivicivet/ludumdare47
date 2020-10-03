@@ -29,11 +29,6 @@ function love.load()
 	CURSOR = love.graphics.newImage("graphics/cursor.png")
 	love.mouse.setVisible(false)
 	
-	basket_eggs = {}
-	for i = 1, 5 do
-		basket_eggs[#basket_eggs + 1] = EGG_TYPES[i]
-	end
-	
 	TASK_TYPES = {
 		click_egg={
 			str="click the egg!",
@@ -46,6 +41,19 @@ function love.load()
 		[STATUS.done]={0.5, 1, 0.8},
 	}
 	
+	NEXT_EGG_TIME = 1
+	CONVEYOR_SPEED = 120
+	GRAVITY = 30
+	EGG_Y = 560
+	EGG_MAXFALL = 100
+	
+	started = false
+	
+	-- for debug, skip splash screen:
+	reset_game()
+end
+
+function reset_game()
 	tasks = {{tasktype=TASK_TYPES.click_egg}, {tasktype=TASK_TYPES.click_egg}}
 	for i, task in ipairs(tasks) do
 		task.status = STATUS.not_done
@@ -54,16 +62,22 @@ function love.load()
 	
 	spawned_eggs = {}
 	t = 0
-	NEXT_EGG_TIME = 1
-	CONVEYOR_SPEED = 120
-	GRAVITY = 30
-	EGG_Y = 560
-	EGG_MAXFALL = 100
 	eggs_lost = 0
 	next_egg_timer = NEXT_EGG_TIME
+	
+	basket_eggs = {}
+	for i = 1, 5 do
+		basket_eggs[#basket_eggs + 1] = EGG_TYPES[i]
+	end
+	
+	started = true
 end
 
 function love.draw()
+	if not started then
+		return
+	end
+	
 	love.graphics.setBackgroundColor(0.25, 0.25, 0.3)
 
 	love.graphics.setFont(BASE_FONT)
@@ -111,6 +125,10 @@ function love.draw()
 end
 
 function love.update(dt)
+	if not started then
+		return
+	end
+	
 	t = t + dt
 	next_egg_timer = next_egg_timer - dt
 	if next_egg_timer < 0 then
