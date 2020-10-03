@@ -26,6 +26,9 @@ function love.load()
 	TRASH_CAN = love.graphics.newImage("graphics/trash_can.png")
 	TRASH_SPRITE_MID = {x=64, y=66}
 	
+	CURSOR = love.graphics.newImage("graphics/cursor.png")
+	love.mouse.setVisible(false)
+	
 	basket_eggs = {}
 	for i = 1, 5 do
 		basket_eggs[#basket_eggs + 1] = EGG_TYPES[i]
@@ -101,6 +104,10 @@ function love.draw()
 	love.graphics.setColor(1, 1, 1)
 	love.graphics.print("eggs left in basket: " .. #basket_eggs, 800, 10)
 	love.graphics.print("eggs lost: " .. eggs_lost, 800, 10 + BASE_FONTSIZE*1.2)
+	
+	-- mouse
+	mouse_x, mouse_y = love.mouse.getPosition()
+	love.graphics.draw(CURSOR, mouse_x, mouse_y)
 end
 
 function love.update(dt)
