@@ -120,7 +120,7 @@ function reset_game()
 		basket_eggs[#basket_eggs + 1] = EGG_TYPES[i]
 	end
 	
-	event_msgs = {{str="begin", t=0}}
+	event_msgs = {{str="begin"}}
 	
 	reset_task_progress() -- must call after defining eggs :)
 	started = true
@@ -190,11 +190,12 @@ function love.draw()
 		end
 	end
 	
+	-- print events
 	love.graphics.setFont(HUGE_FONT)
-	love.graphics.setColor(1, 1, 1, 0.5)
 	for i, event_msg in ipairs(event_msgs) do
-		love.graphics.setColor(1, 1, 1, 0.7 * (1 - event_msg.t))
-		love.graphics.printf(event_msg.str, 0, 300 + event_msg.t * 10, 1280, "center")
+		cr, cg, cb = unpack(event_msg.col or {1, 1, 1})
+		love.graphics.setColor(cr, cg, cb, 0.7 * (1 - (event_msg.t or 1)))
+		love.graphics.printf(event_msg.str, 0, 270 + event_msg.t * 10, 1280, "center")
 	end
 	
 	-- placeholder conveyor:
@@ -258,12 +259,16 @@ function love.update(dt)
 			if egg.y > EGG_Y + EGG_MAXFALL then
 				eggs_lost = eggs_lost + 1
 				table.remove(spawned_eggs, i)
+				event_msgs[#event_msgs + 1] = {str="egg failed!", col={1, 0.3, 0.3}}
 				reset_task_progress()
 			end
 		end
 	end
 	
 	for i, event_msg in ipairs(event_msgs) do
+		if event_msg.t == nil then
+			event_msg.t = 0
+		end
 		event_msg.t = event_msg.t + dt
 		if event_msg.t > 1 then
 			table.remove(event_msgs, i)
@@ -303,10 +308,12 @@ function complete_task()
 		current_task = tasks[current_task_idx]
 		current_task.status = STATUS.current
 		complete_current_task_if_free()
+		event_msgs[#event_msgs + 1] = {str="task completed!"}
 		return
 	end
 	-- we finished an egg!
 	table.remove(spawned_eggs, 1)
+	event_msgs[#event_msgs + 1] = {str="egg cleared!", col={0.3, 1, 0.4}}
 	reset_task_progress()
 	if #spawned_eggs == 0 and #basket_eggs == 0 then
 		started = false -- temp while we don't have more tasks etc!
