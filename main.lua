@@ -113,6 +113,8 @@ function reset_game()
 	spawned_eggs = {}
 	t = 0
 	eggs_lost = 0
+	eggs_cleared = 0
+	loops_cleared = 0
 	next_egg_timer = NEXT_EGG_TIME
 	
 	basket_eggs = {}
@@ -224,8 +226,14 @@ function love.draw()
 	-- status gui
 	love.graphics.setColor(1, 1, 1)
 	love.graphics.setFont(BASE_FONT)
-	love.graphics.print("eggs left in basket: " .. #basket_eggs, 800, 10)
-	love.graphics.print("eggs lost: " .. eggs_lost, 800, 10 + BASE_FONTSIZE*1.2)
+	text_d_y = 10
+	love.graphics.print("eggs left in basket: " .. #basket_eggs, 800, text_d_y)
+	text_d_y = text_d_y + BASE_FONTSIZE * 1.2
+	love.graphics.print("eggs lost: " .. eggs_lost, 800, text_d_y)
+	text_d_y = text_d_y + BASE_FONTSIZE * 1.2
+	love.graphics.print("eggs cleared: " .. eggs_cleared, 800, text_d_y)
+	text_d_y = text_d_y + BASE_FONTSIZE * 1.2
+	love.graphics.print("loops cleared: " .. loops_cleared, 800, text_d_y)
 	
 	-- mouse
 	draw_cursor()
@@ -304,6 +312,7 @@ end
 function complete_task()
 	current_task.status = STATUS.done
 	current_task_idx = current_task_idx + 1
+	-- still tasks to go
 	if current_task_idx <= #tasks then
 		current_task = tasks[current_task_idx]
 		current_task.status = STATUS.current
@@ -311,11 +320,13 @@ function complete_task()
 		event_msgs[#event_msgs + 1] = {str="task completed!"}
 		return
 	end
-	-- we finished an egg!
+	-- no tasks left: we finished an egg!
 	table.remove(spawned_eggs, 1)
 	event_msgs[#event_msgs + 1] = {str="egg cleared!", col={0.3, 1, 0.4}}
+	eggs_cleared = eggs_cleared + 1
 	reset_task_progress()
 	if #spawned_eggs == 0 and #basket_eggs == 0 then
+		loops_cleared = loops_cleared + 1
 		started = false -- temp while we don't have more tasks etc!
 	end
 end
