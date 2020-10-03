@@ -50,7 +50,8 @@ function love.load()
 			str="click the next egg after the current one!",
 		},
 		click_any_xcol={
-			str="click any % egg!",
+			str="click any %s egg!",
+			fmt_col=true,
 		},
 	}
 	STATUS = {not_done=0, current=1, done=2}
@@ -145,7 +146,12 @@ function love.draw()
 	for i, task in ipairs(tasks) do
 		love.graphics.setColor(TASK_STATUS_COLOURS[task.status])
 		text_d_y = text_d_y + BASE_FONTSIZE * 1.2
-		love.graphics.print(task.tasktype.str, text_d_x, text_d_y)
+		if not (task.tasktype.fmt_col == nil) then
+			task_str = task.tasktype.str:format(task.col)
+		else
+			task_str = task.tasktype.str
+		end
+		love.graphics.print(task_str, text_d_x, text_d_y)
 		if task.status == STATUS.current and math.floor(t * 2) % 2 == 0 then
 			love.graphics.print(">", text_d_x - 25, text_d_y)
 		end
