@@ -408,7 +408,7 @@ end
 
 
 function is_in_egg(egg, x, y)
-	rel = {x=x - (egg.x - EGG_SPRITE_BOT.x), y=y- (egg.y - EGG_SPRITE_BOT.y)}
+	rel = {x=x - (egg.x - EGG_SPRITE_BOT.x), y=y - (egg.y - EGG_SPRITE_BOT.y)}
 	if (
 		rel.x < 0 or rel.x > EGG_HITBOX_WIDTH
 		or rel.y < 0 or rel.y > EGG_HITBOX_HEIGHT
