@@ -276,7 +276,7 @@ function love.draw()
 		love.graphics.printf("↓", egg.x - 30, egg.y - 150, 60, "center")
 	end
 	conv_frame_num = math.floor(conveyor_t * CONVEYOR_SPEED / 4) % #CONVEYOR_FRAMES
-	love.graphics.draw(CONVEYOR_FRAMES[conv_frame_num], 200, EGG_Y)
+	love.graphics.draw(CONVEYOR_FRAMES[conv_frame_num], 210, EGG_Y - 5)
 	love.graphics.setFont(BASE_FONT)
 	for i, egg in ipairs(spawned_eggs) do
 		love.graphics.draw(
