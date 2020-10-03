@@ -8,41 +8,13 @@ function love.load()
 	BASE_FONT = love.graphics.newFont("fonts/VCR_OSD_MONO_1.001.ttf", BASE_FONTSIZE)
 	
 	EGG_TYPES = {
-		{
-			col="blue",
-			striped=false,
-			sprite_name="egg_blue_dotty",
-		},
-		{
-			col="green",
-			striped=false,
-			sprite_name="egg_green_dotty",
-		},
-		{
-			col="red",
-			striped=false,
-			sprite_name="egg_red_dotty",
-		},
-		{
-			col="blue",
-			striped=true,
-			sprite_name="egg_blue_striped",
-		},
-		{
-			col="green",
-			striped=true,
-			sprite_name="egg_green_striped",
-		},
-		{
-			col="red",
-			striped=true,
-			sprite_name="egg_red_striped",
-		},
-		{
-			col="gold",
-			striped=false,
-			sprite_name="egg_golden",
-		},
+		{col="blue", striped=false, sprite_name="egg_blue_dotty"},
+		{col="green", striped=false, sprite_name="egg_green_dotty"},
+		{col="red", striped=false, sprite_name="egg_red_dotty"},
+		{col="blue", striped=true, sprite_name="egg_blue_striped"},
+		{col="green", striped=true, sprite_name="egg_green_striped"},
+		{col="red", striped=true, sprite_name="egg_red_striped"},
+		{col="gold", striped=false, sprite_name="egg_golden"},
 	}
 	for i, eggtype_info in ipairs(EGG_TYPES) do
 		eggtype_info["sprite"] = love.graphics.newImage(
