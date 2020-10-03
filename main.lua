@@ -41,7 +41,9 @@ function love.load()
 	
 	BACKGROUND = love.graphics.newImage("graphics/background.png")
 	
+	-- probs not using tick_behind
 	EGG_TICK_BEHIND = love.graphics.newImage("graphics/egg_tick_behind.png")
+	EGG_GREY_CENTER = love.graphics.newImage("graphics/egg_grey_center.png")
 	
 	TRASH_CAN = love.graphics.newImage("graphics/trash_can.png")
 	TRASH_SPRITE_MID = {x=64, y=66}
@@ -57,16 +59,13 @@ function love.load()
 	WASD = {right="d", up="w", down="s", left="a"}
 	
 	TASK_TYPES = {
-		click_egg={
-			str="click the egg!",
-		},
-		click_next_egg={
-			str="click the next egg after the current one!",
-		},
+		click_egg={str="click the egg!"},
+		click_next_egg={str="click the next egg after the current one!"},
 		click_any_xcol={
 			str="click any %s egg!",
 			fmt_col=true,
 		},
+		click_any_striped={str="click any striped egg!"},
 		click_n_eggs={
 			str="click any %d eggs!",
 			fmt_n=true,
@@ -127,9 +126,10 @@ function reset_game()
 		--{tasktype=TASK_TYPES.click_any_xcol, col="green"},
 		--{tasktype=TASK_TYPES.click_any_xcol, col="red"},
 		--{tasktype=TASK_TYPES.keyseq, seq={"up", "left", "up", "down"}},
-		{tasktype=TASK_TYPES.mash_keys, n=10},
-		{tasktype=TASK_TYPES.click_n_eggs, n=3},
 		{tasktype=TASK_TYPES.click_egg},
+		{tasktype=TASK_TYPES.click_n_eggs, n=3},
+		{tasktype=TASK_TYPES.click_any_striped},
+		{tasktype=TASK_TYPES.mash_keys, n=10},
 		{tasktype=TASK_TYPES.click_next_egg},
 		{tasktype=TASK_TYPES.click_any_xcol, col="blue"},
 	}
@@ -269,18 +269,20 @@ function love.draw()
 	end
 	love.graphics.setFont(BASE_FONT)
 	for i, egg in ipairs(spawned_eggs) do
-		if current_task.hit_idxs and current_task.hit_idxs[i] then
-			love.graphics.draw(
-				EGG_TICK_BEHIND,
-				egg.x - EGG_SPRITE_BOT.x,
-				egg.y - EGG_SPRITE_BOT.y
-			)
-		end
 		love.graphics.draw(
 			egg.eggtype.sprite,
 			egg.x - EGG_SPRITE_BOT.x,
 			egg.y - EGG_SPRITE_BOT.y
 		)
+		if current_task.hit_idxs and current_task.hit_idxs[i] then
+			love.graphics.setColor(1, 1, 1, 0.6)
+			love.graphics.draw(
+				EGG_GREY_CENTER,
+				egg.x - EGG_SPRITE_BOT.x,
+				egg.y - EGG_SPRITE_BOT.y
+			)
+			love.graphics.setColor(1, 1, 1, 1)
+		end
 	end
 	love.graphics.draw(
 		TRASH_CAN,
@@ -401,7 +403,21 @@ function setup_current_task()
 		if not exists then
 			complete_task()
 		end
+	elseif current_task.tasktype == TASK_TYPES.click_any_striped then
+		-- todo: currently breaks if only tasks are ones that
+		-- don't have any eggs, because we get into a loop. should
+		-- probably figure that out...
+		exists = false
+		for i, egg in ipairs(spawned_eggs) do
+			if egg.eggtype.striped then
+				exists = true
+			end
+		end
+		if not exists then
+			complete_task()
+		end
 	elseif current_task.tasktype == TASK_TYPES.click_n_eggs then
+		-- here we include basket eggs because you could wait for them.
 		current_task.excess = 0
 		current_task.hit_idxs = {}
 		total_eggs = #spawned_eggs + #basket_eggs
@@ -496,6 +512,12 @@ function love.mousepressed(x, y, button, istouch, presses)
 	elseif current_task.tasktype == TASK_TYPES.click_any_xcol then
 		for i, egg in ipairs(spawned_eggs) do
 			if egg.eggtype.col == current_task.col and is_in_egg(egg, x, y) then
+				complete_task()
+			end
+		end
+	elseif current_task.tasktype == TASK_TYPES.click_any_striped then
+		for i, egg in ipairs(spawned_eggs) do
+			if egg.eggtype.striped and is_in_egg(egg, x, y) then
 				complete_task()
 			end
 		end
