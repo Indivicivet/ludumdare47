@@ -87,7 +87,7 @@ function love.load()
 	STATUS = {not_done=0, current=1, done=2}
 	TASK_STATUS_COLOURS = {
 		[STATUS.not_done]={1, 1, 1},
-		[STATUS.current]={0.5, 0.5, 1},
+		[STATUS.current]={0.6, 0.7, 1},
 		[STATUS.done]={0.5, 1, 0.8},
 	}
 	
