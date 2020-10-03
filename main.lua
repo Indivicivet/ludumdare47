@@ -50,6 +50,8 @@ function love.load()
 		)
 	end
 	
+	TRASH_CAN = love.graphics.newImage("graphics/trash_can.png")
+	
 	basket_eggs = {}
 	for i = 1, 5 do
 		basket_eggs[#basket_eggs + 1] = EGG_TYPES[i]
@@ -79,6 +81,7 @@ function love.load()
 	CONVEYOR_SPEED = 120
 	GRAVITY = 30
 	EGG_Y = 500
+	EGG_MAXFALL = 100
 	eggs_lost = 0
 	next_egg_timer = NEXT_EGG_TIME
 end
@@ -102,6 +105,7 @@ function love.draw()
 	for i, egg in ipairs(spawned_eggs) do
 		love.graphics.draw(egg.eggtype.sprite, egg.x, egg.y)
 	end
+	love.graphics.draw(TRASH_CAN, 160, EGG_Y + EGG_MAXFALL)
 	love.graphics.print("eggs left in basket: " .. #basket_eggs, 800, 10)
 	love.graphics.print("eggs lost: " .. eggs_lost, 800, 10 + BASE_FONTSIZE*1.2)
 end
@@ -126,7 +130,7 @@ function love.update(dt)
 		if egg.x < 200 then
 			egg.vdown = egg.vdown + GRAVITY * dt
 			egg.y = egg.y + egg.vdown
-			if egg.y > EGG_Y + 100 then
+			if egg.y > EGG_Y + EGG_MAXFALL then
 				eggs_lost = eggs_lost + 1
 				table.remove(spawned_eggs, i)
 			end
