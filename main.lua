@@ -93,6 +93,7 @@ function love.load()
 	
 	NEXT_EGG_TIME = 1.3
 	CONVEYOR_SPEED = 75
+	CONVEYOR_BACKSPEED_RATIO = 0.3
 	GRAVITY = 10
 	EGG_Y = 560
 	EGG_MAXFALL = 100
@@ -162,7 +163,7 @@ function reset_game()
 	started = true
 	
 	conveyor_moving = true
-	conveyor_t = 0
+	conveyor_t = 0 -- for conveyor sprite
 	conveyor_reset_timer = 0
 end
 
@@ -345,6 +346,8 @@ function love.update(dt)
 	t = t + dt
 	if conveyor_moving then
 		conveyor_t = conveyor_t + dt
+	else
+		conveyor_t = conveyor_t - dt * CONVEYOR_BACKSPEED_RATIO
 	end
 	
 	next_egg_timer = next_egg_timer - dt
@@ -372,13 +375,16 @@ function love.update(dt)
 	-- move eggs; first we block on the conveyor being active
 	if not conveyor_moving then
 		conveyor_reset_timer = conveyor_reset_timer - dt
-		if conveyor_reset_timer > 0 then
-			return
+		if conveyor_reset_timer <= 0 then
+			conveyor_moving = true
 		end
-		conveyor_moving = true
 	end
 	for i, egg in ipairs(spawned_eggs) do
-		egg.x = egg.x - CONVEYOR_SPEED * dt - love.math.randomNormal(20, 0) * dt
+		move_by = CONVEYOR_SPEED * dt - love.math.randomNormal(20, 0) * dt
+		if not conveyor_moving then
+			move_by = move_by * (- CONVEYOR_BACKSPEED_RATIO)
+		end
+		egg.x = egg.x - move_by
 		if egg.x < 200 then
 			egg.vdown = egg.vdown + GRAVITY * dt
 			egg.y = egg.y + egg.vdown
