@@ -39,6 +39,8 @@ function love.load()
 		end
 	end
 	
+	BACKGROUND = love.graphics.newImage("graphics/background.png")
+	
 	EGG_TICK_BEHIND = love.graphics.newImage("graphics/egg_tick_behind.png")
 	
 	TRASH_CAN = love.graphics.newImage("graphics/trash_can.png")
@@ -210,11 +212,14 @@ function love.draw()
 		return
 	end
 	
-	love.graphics.setFont(BASE_FONT)
-	-- tasks
 	love.graphics.setColor(1, 1, 1)
-	text_d_x = 40
-	text_d_y = 20
+	love.graphics.draw(BACKGROUND)
+	
+	-- tasks
+	love.graphics.setFont(BASE_FONT)
+	love.graphics.setColor(1, 1, 1)
+	text_d_x = 50
+	text_d_y = 40
 	love.graphics.print("for egg in basket:", text_d_x, text_d_y)
 	text_d_x = text_d_x + 50 -- tab in
 	for i, task in ipairs(tasks) do
