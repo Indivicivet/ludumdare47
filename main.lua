@@ -4,7 +4,7 @@ function love.load()
 	love.window.setMode(WIDTH, HEIGHT)
 	love.window.setTitle("for egg in basket")
 
-	BASE_FONTSIZE = 22
+	BASE_FONTSIZE = 24
 	BASE_FONT = love.graphics.newFont("fonts/VCR_OSD_MONO_1.001.ttf", BASE_FONTSIZE)
 	TITLE_FONT = love.graphics.newFont("fonts/VCR_OSD_MONO_1.001.ttf", BASE_FONTSIZE * 3)
 	
