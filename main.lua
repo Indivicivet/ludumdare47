@@ -8,6 +8,7 @@ function love.load()
 	BASE_FONT = love.graphics.newFont("fonts/VCR_OSD_MONO_1.001.ttf", BASE_FONTSIZE)
 	BIG_FONT = love.graphics.newFont("fonts/VCR_OSD_MONO_1.001.ttf", BASE_FONTSIZE * 2)
 	TITLE_FONT = love.graphics.newFont("fonts/VCR_OSD_MONO_1.001.ttf", BASE_FONTSIZE * 3)
+	HUGE_FONT = love.graphics.newFont("fonts/VCR_OSD_MONO_1.001.ttf", BASE_FONTSIZE * 4)
 	
 	EGG_TYPES = {
 		{col="blue", striped=false, sprite_name="egg_blue_dotty"},
@@ -119,6 +120,8 @@ function reset_game()
 		basket_eggs[#basket_eggs + 1] = EGG_TYPES[i]
 	end
 	
+	event_msgs = {{str="begin", t=0}}
+	
 	reset_task_progress() -- must call after defining eggs :)
 	started = true
 end
@@ -187,6 +190,13 @@ function love.draw()
 		end
 	end
 	
+	love.graphics.setFont(HUGE_FONT)
+	love.graphics.setColor(1, 1, 1, 0.5)
+	for i, event_msg in ipairs(event_msgs) do
+		love.graphics.setColor(1, 1, 1, 0.7 * (1 - event_msg.t))
+		love.graphics.printf(event_msg.str, 0, 300 + event_msg.t * 10, 1280, "center")
+	end
+	
 	-- placeholder conveyor:
 	love.graphics.setColor(0.5, 0.5, 0.5)
 	love.graphics.rectangle("fill", 200, EGG_Y, 900, 30, 15, 15)
@@ -239,6 +249,7 @@ function love.update(dt)
 			next_egg_timer = NEXT_EGG_TIME
 		end
 	end
+	
 	for i, egg in ipairs(spawned_eggs) do
 		egg.x = egg.x - CONVEYOR_SPEED * dt
 		if egg.x < 200 then
@@ -249,6 +260,13 @@ function love.update(dt)
 				table.remove(spawned_eggs, i)
 				reset_task_progress()
 			end
+		end
+	end
+	
+	for i, event_msg in ipairs(event_msgs) do
+		event_msg.t = event_msg.t + dt
+		if event_msg.t > 1 then
+			table.remove(event_msgs, i)
 		end
 	end
 end
