@@ -21,8 +21,10 @@ function love.load()
 			"graphics/" .. eggtype_info["sprite_name"] .. ".png"
 		)
 	end
+	EGG_SPRITE_BOT = {x=62, y=110}
 	
 	TRASH_CAN = love.graphics.newImage("graphics/trash_can.png")
+	TRASH_SPRITE_MID = {x=64, y=66}
 	
 	basket_eggs = {}
 	for i = 1, 5 do
@@ -52,7 +54,7 @@ function love.load()
 	NEXT_EGG_TIME = 1
 	CONVEYOR_SPEED = 120
 	GRAVITY = 30
-	EGG_Y = 500
+	EGG_Y = 560
 	EGG_MAXFALL = 100
 	eggs_lost = 0
 	next_egg_timer = NEXT_EGG_TIME
@@ -75,15 +77,23 @@ function love.draw()
 		end
 	end
 	
+	-- placeholder conveyor:
+	love.graphics.setColor(0.5, 0.5, 0.5)
+	love.graphics.rectangle("fill", 200, EGG_Y, 900, 30, 15, 15)
 	-- sprites
 	love.graphics.setColor(1, 1, 1)
 	for i, egg in ipairs(spawned_eggs) do
-		love.graphics.draw(egg.eggtype.sprite, egg.x, egg.y)
+		love.graphics.draw(
+			egg.eggtype.sprite,
+			egg.x - EGG_SPRITE_BOT.x,
+			egg.y - EGG_SPRITE_BOT.y
+		)
 	end
-	love.graphics.draw(TRASH_CAN, 160, EGG_Y + EGG_MAXFALL)
-	-- placeholder conveyor:
-	love.graphics.setColor(0.5, 0.5, 0.5)
-	love.graphics.rectangle("fill", 300, EGG_Y + 120, 900, 30, 15, 15)
+	love.graphics.draw(
+		TRASH_CAN,
+		140 - TRASH_SPRITE_MID.x,
+		EGG_Y + EGG_MAXFALL - TRASH_SPRITE_MID.y
+	)
 	
 	-- status gui
 	love.graphics.setColor(1, 1, 1)
