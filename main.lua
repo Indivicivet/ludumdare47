@@ -105,8 +105,16 @@ function reset_task_progress()
 	complete_current_task_if_free()
 end
 
+function new_basket(n)
+	bask = {}
+	for i = 1, n do
+		bask[i] = basket_eggs_set[((i - 1) % #basket_eggs_set) + 1]
+	end
+	return bask
+end
+
 function reset_game()
-	tasks = {
+	task_queue = {
 		--{tasktype=TASK_TYPES.click_any_xcol, col="green"},
 		--{tasktype=TASK_TYPES.click_any_xcol, col="red"},
 		{tasktype=TASK_TYPES.keyseq, seq={"up", "left", "up", "down"}},
@@ -116,6 +124,8 @@ function reset_game()
 		{tasktype=TASK_TYPES.click_any_xcol, col="blue"},
 	}
 	
+	tasks = {task_queue[1]}
+	
 	spawned_eggs = {}
 	t = 0
 	eggs_lost = 0
@@ -123,10 +133,11 @@ function reset_game()
 	loops_cleared = 0
 	next_egg_timer = NEXT_EGG_TIME
 	
-	basket_eggs = {}
+	basket_eggs_set = {}
 	for i = 1, 5 do
-		basket_eggs[#basket_eggs + 1] = EGG_TYPES[i]
+		basket_eggs_set[#basket_eggs_set + 1] = EGG_TYPES[i]
 	end
+	basket_eggs = new_basket(3)
 	
 	event_msgs = {{str="begin"}}
 	click_highlights = {}
@@ -187,7 +198,7 @@ function love.draw()
 	love.graphics.print("for egg in basket:", text_d_x, text_d_y)
 	text_d_x = text_d_x + 50 -- tab in
 	for i, task in ipairs(tasks) do
-		love.graphics.setColor(TASK_STATUS_COLOURS[task.status])
+		love.graphics.setColor(TASK_STATUS_COLOURS[task.status] or {1, 1, 1})
 		text_d_y = text_d_y + BASE_FONTSIZE * 1.25
 		task_str = task.tasktype.str
 		if not (task.tasktype.fmt_col == nil) then
@@ -338,7 +349,12 @@ end
 function complete_current_task_if_free()
 	-- call this when we reset tasks or complete_task()s
 	-- some tasks we want to complete for free:
-	if current_task.tasktype == TASK_TYPES.click_next_egg then
+	if current_task.tasktype == TASK_TYPES.click_egg then
+		-- probably only relevant if don't respawn eggs properly...
+		if #spawned_eggs + #basket_eggs < 1 then
+			complete_task()
+		end
+	elseif current_task.tasktype == TASK_TYPES.click_next_egg then
 		if #spawned_eggs + #basket_eggs < 2 then
 			complete_task()
 		end
@@ -356,6 +372,9 @@ function complete_current_task_if_free()
 		total_eggs = #spawned_eggs + #basket_eggs
 		if total_eggs < current_task.n then
 			current_task.progress = current_task.n - total_eggs
+		end
+		if current_task.progress == current_task.n then
+			complete_task()
 		end
 	end
 end
@@ -378,7 +397,12 @@ function complete_task()
 	reset_task_progress()
 	if #spawned_eggs == 0 and #basket_eggs == 0 then
 		loops_cleared = loops_cleared + 1
-		started = false -- temp while we don't have more tasks etc!
+		if #tasks >= #task_queue then
+			started = false
+			return
+		end
+		tasks[#tasks + 1] = task_queue[#tasks + 1]
+		
 	end
 end
 
