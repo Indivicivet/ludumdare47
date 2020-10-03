@@ -6,6 +6,7 @@ function love.load()
 
 	BASE_FONTSIZE = 24
 	BASE_FONT = love.graphics.newFont("fonts/VCR_OSD_MONO_1.001.ttf", BASE_FONTSIZE)
+	BIG_FONT = love.graphics.newFont("fonts/VCR_OSD_MONO_1.001.ttf", BASE_FONTSIZE * 2)
 	TITLE_FONT = love.graphics.newFont("fonts/VCR_OSD_MONO_1.001.ttf", BASE_FONTSIZE * 3)
 	
 	EGG_TYPES = {
@@ -191,6 +192,11 @@ function love.draw()
 	love.graphics.rectangle("fill", 200, EGG_Y, 900, 30, 15, 15)
 	-- sprites
 	love.graphics.setColor(1, 1, 1)
+	if #spawned_eggs >= 1 then
+		egg = spawned_eggs[1]
+		love.graphics.setFont(BIG_FONT)
+		love.graphics.printf("↓", egg.x - 30, egg.y - 150, 60, "center")
+	end
 	for i, egg in ipairs(spawned_eggs) do
 		love.graphics.draw(
 			egg.eggtype.sprite,
@@ -206,6 +212,7 @@ function love.draw()
 	
 	-- status gui
 	love.graphics.setColor(1, 1, 1)
+	love.graphics.setFont(BASE_FONT)
 	love.graphics.print("eggs left in basket: " .. #basket_eggs, 800, 10)
 	love.graphics.print("eggs lost: " .. eggs_lost, 800, 10 + BASE_FONTSIZE*1.2)
 	
