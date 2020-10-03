@@ -68,7 +68,7 @@ function love.load()
 			fmt_col=true,
 		},
 		click_n_eggs={
-			str="click any %d different eggs!",
+			str="click any %d eggs!",
 			fmt_n=true,
 		},
 		keyseq={
