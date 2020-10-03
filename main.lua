@@ -251,10 +251,14 @@ function love.draw()
 	-- print events
 	love.graphics.setFont(HUGE_FONT)
 	for i, event_msg in ipairs(event_msgs) do
+		if i > 1 and (event_msg.d_y == nil) then
+			event_msg.d_y = love.math.random(-30, 30)
+		end
 		cr, cg, cb = unpack(event_msg.col or {1, 1, 1})
 		event_t = event_msg.t or 1
+		event_d_y = event_msg.d_y or 0
 		love.graphics.setColor(cr, cg, cb, 0.7 * (1 - event_t))
-		love.graphics.printf(event_msg.str, 0, 270 + event_t * 10, 1280, "center")
+		love.graphics.printf(event_msg.str, 0, 270 + event_d_y + event_t * 10, 1280, "center")
 	end
 	
 	-- placeholder conveyor:
