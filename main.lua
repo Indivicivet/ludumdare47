@@ -52,6 +52,11 @@ function love.load()
 	BASKET_BACK = love.graphics.newImage("graphics/basket_back.png")
 	BASKET_TOP_MID = {x=63, y=40}
 	
+	CONVEYOR_FRAMES = {}
+	for i = 0, 9 do
+		CONVEYOR_FRAMES[i] = love.graphics.newImage("graphics/conveyor" .. i .. ".png")
+	end
+	
 	CURSOR = love.graphics.newImage("graphics/cursor.png")
 	love.mouse.setVisible(false)
 	
@@ -157,6 +162,7 @@ function reset_game()
 	started = true
 	
 	conveyor_moving = true
+	conveyor_t = 0
 	conveyor_reset_timer = 0
 end
 
@@ -261,9 +267,6 @@ function love.draw()
 		love.graphics.printf(event_msg.str, 0, 270 + event_d_y + event_t * 10, 1280, "center")
 	end
 	
-	-- placeholder conveyor:
-	love.graphics.setColor(0.5, 0.5, 0.5)
-	love.graphics.rectangle("fill", 200, EGG_Y, 900, 30, 15, 15)
 	-- sprites
 	love.graphics.setColor(1, 1, 1)
 	if #spawned_eggs >= 1 then
@@ -271,6 +274,8 @@ function love.draw()
 		love.graphics.setFont(BIG_FONT)
 		love.graphics.printf("↓", egg.x - 30, egg.y - 150, 60, "center")
 	end
+	conv_frame_num = math.floor(conveyor_t * CONVEYOR_SPEED / 4) % #CONVEYOR_FRAMES
+	love.graphics.draw(CONVEYOR_FRAMES[conv_frame_num], 200, EGG_Y)
 	love.graphics.setFont(BASE_FONT)
 	for i, egg in ipairs(spawned_eggs) do
 		love.graphics.draw(
@@ -338,6 +343,10 @@ function love.update(dt)
 	end
 	
 	t = t + dt
+	if conveyor_moving then
+		conveyor_t = conveyor_t + dt
+	end
+	
 	next_egg_timer = next_egg_timer - dt
 	if next_egg_timer < 0 then
 		spawn_egg()
