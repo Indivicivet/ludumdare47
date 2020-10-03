@@ -86,7 +86,7 @@ function love.load()
 	}
 	
 	NEXT_EGG_TIME = 1.3
-	CONVEYOR_SPEED = 90
+	CONVEYOR_SPEED = 75
 	GRAVITY = 30
 	EGG_Y = 560
 	EGG_MAXFALL = 100
