@@ -183,12 +183,12 @@ function love.draw()
 	-- tasks
 	love.graphics.setColor(1, 1, 1)
 	text_d_x = 40
-	text_d_y = 10
+	text_d_y = 20
 	love.graphics.print("for egg in basket:", text_d_x, text_d_y)
 	text_d_x = text_d_x + 50 -- tab in
 	for i, task in ipairs(tasks) do
 		love.graphics.setColor(TASK_STATUS_COLOURS[task.status])
-		text_d_y = text_d_y + BASE_FONTSIZE * 1.2
+		text_d_y = text_d_y + BASE_FONTSIZE * 1.25
 		task_str = task.tasktype.str
 		if not (task.tasktype.fmt_col == nil) then
 			task_str = task_str:format(task.col)
@@ -262,11 +262,11 @@ function love.draw()
 	-- status gui
 	love.graphics.setColor(1, 1, 1)
 	love.graphics.setFont(BASE_FONT)
-	text_d_y = 10
+	text_d_y = 20
 	love.graphics.print("eggs lost: " .. eggs_lost, 800, text_d_y)
-	text_d_y = text_d_y + BASE_FONTSIZE * 1.2
+	text_d_y = text_d_y + BASE_FONTSIZE * 1.25
 	love.graphics.print("eggs cleared: " .. eggs_cleared, 800, text_d_y)
-	text_d_y = text_d_y + BASE_FONTSIZE * 1.2
+	text_d_y = text_d_y + BASE_FONTSIZE * 1.25
 	love.graphics.print("loops cleared: " .. loops_cleared, 800, text_d_y)
 	
 	-- mouse
