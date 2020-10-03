@@ -129,6 +129,7 @@ function reset_game()
 	end
 	
 	event_msgs = {{str="begin"}}
+	click_highlights = {}
 	
 	reset_task_progress() -- must call after defining eggs :)
 	started = true
@@ -139,10 +140,16 @@ end
 
 function draw_cursor()
 	-- used in both splash screen and ingame
+	love.graphics.setColor(1, 1, 1, 0.5)
+	for i, hl in ipairs(click_highlights) do
+		love.graphics.circle("line", hl.x, hl.y, (hl.t or 0) * 60)
+	end
 	mouse_x, mouse_y = love.mouse.getPosition()
 	if love.mouse.isDown(1) then
-		mouse_y = mouse_y + 5
+		mouse_x = mouse_x + 1
+		mouse_y = mouse_y + 4
 	end
+	love.graphics.setColor(1, 1, 1)
 	love.graphics.draw(CURSOR, mouse_x, mouse_y)
 end
 
@@ -296,6 +303,13 @@ function love.update(dt)
 		end
 	end
 	
+	for i, click in ipairs(click_highlights) do
+		click.t = click.t + dt
+		if click.t > 0.3 then
+			table.remove(click_highlights, i)
+		end
+	end
+	
 	-- move eggs; first we block on the conveyor being active
 	if not conveyor_moving then
 		conveyor_reset_timer = conveyor_reset_timer - dt
@@ -385,6 +399,9 @@ function love.mousepressed(x, y, button, istouch, presses)
 	if not started then
 		reset_game()
 	end
+	
+	click_highlights[#click_highlights + 1] = {x=x, y=y, t=0}
+	
 	-- inactive
 	if #spawned_eggs == 0 then
 		return
