@@ -42,6 +42,9 @@ function love.load()
 	CURSOR = love.graphics.newImage("graphics/cursor.png")
 	love.mouse.setVisible(false)
 	
+	ARROW_CHARS = {right="→", up="↑", down="↓", left="←"}
+	WASD = {right="d", up="w", down="s", left="a"}
+	
 	TASK_TYPES = {
 		click_egg={
 			str="click the egg!",
@@ -56,6 +59,10 @@ function love.load()
 		click_n_eggs={
 			str="click any %d different eggs!",
 			fmt_n=true,
+		},
+		keyseq={
+			str="press the key sequence! %s",
+			fmt_arrowseq=true,
 		},
 	}
 	STATUS = {not_done=0, current=1, done=2}
@@ -86,6 +93,7 @@ function reset_task_progress()
 	end
 	tasks[1].status = STATUS.current
 	current_task_idx = 1
+	current_task = tasks[current_task_idx]
 	complete_current_task_if_free()
 end
 
@@ -93,6 +101,7 @@ function reset_game()
 	tasks = {
 		--{tasktype=TASK_TYPES.click_any_xcol, col="green"},
 		--{tasktype=TASK_TYPES.click_any_xcol, col="red"},
+		{tasktype=TASK_TYPES.keyseq, seq={"up", "left", "up", "down"}},
 		{tasktype=TASK_TYPES.click_n_eggs, n=3},
 		{tasktype=TASK_TYPES.click_egg},
 		{tasktype=TASK_TYPES.click_next_egg},
@@ -160,9 +169,16 @@ function love.draw()
 		end
 		if not (task.tasktype.fmt_n == nil) then
 			task_str = task_str:format(task.n)
-			if not (task.progress == nil) then
-				task_str = task_str .. " (" .. task.progress .. "/" .. task.n .. ")"
+		end
+		if not (task.tasktype.fmt_arrowseq == nil) then
+			arr_str = ""
+			for j, dir in ipairs(task.seq) do
+				arr_str = arr_str .. ARROW_CHARS[dir]
 			end
+			task_str = task_str:format(arr_str)
+		end
+		if not (task.progress == nil) then
+			task_str = task_str .. " (" .. task.progress .. "/" .. task.n .. ")"
 		end
 		love.graphics.print(task_str, text_d_x, text_d_y)
 		if task.status == STATUS.current and math.floor(t * 2) % 2 == 0 then
@@ -233,7 +249,6 @@ end
 function complete_current_task_if_free()
 	-- call this when we reset tasks or complete_task()s
 	-- some tasks we want to complete for free:
-	current_task = tasks[current_task_idx]
 	if current_task.tasktype == TASK_TYPES.click_next_egg then
 		if #spawned_eggs + #basket_eggs < 2 then
 			complete_task()
@@ -257,10 +272,11 @@ function complete_current_task_if_free()
 end
 
 function complete_task()
-	tasks[current_task_idx].status = STATUS.done
+	current_task.status = STATUS.done
 	current_task_idx = current_task_idx + 1
 	if current_task_idx <= #tasks then
-		tasks[current_task_idx].status = STATUS.current
+		current_task = tasks[current_task_idx]
+		current_task.status = STATUS.current
 		complete_current_task_if_free()
 		return
 	end
@@ -295,7 +311,6 @@ function love.mousepressed(x, y, button, istouch, presses)
 	end
 	
 	-- see if we had a "clicking on egg" task!
-	current_task = tasks[current_task_idx]
 	if current_task.tasktype == TASK_TYPES.click_egg then
 		if is_in_egg(spawned_eggs[1], x, y) then
 			complete_task()
@@ -335,5 +350,20 @@ function love.keypressed(key, scancode, isrepeat)
 	-- on my PC at the moment?
 	if key == "escape" then
 		love.event.quit()
+	end
+	
+	if current_task.tasktype == TASK_TYPES.keyseq then
+		if current_task.progress == nil then
+			current_task.progress = 0
+			current_task.n = #current_task.seq
+		end
+		target_key = current_task.seq[current_task.progress + 1]
+		target_wasd_key = WASD[target_key]
+		if key == target_key or key == target_wasd_key then
+			current_task.progress = current_task.progress + 1
+		end
+		if current_task.progress == current_task.n then
+			complete_task()
+		end
 	end
 end
