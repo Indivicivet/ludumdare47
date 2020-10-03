@@ -226,10 +226,10 @@ function love.mousepressed(x, y, button, istouch, presses)
 	if not started then
 		reset_game()
 	end
+	if #spawned_eggs == 0 then
+		return
+	end
 	if tasks[current_task_idx].tasktype == TASK_TYPES.click_egg then
-		if #spawned_eggs == 0 then
-			return
-		end
 		if is_in_egg(spawned_eggs[1], x, y) then
 			complete_task()
 		end
