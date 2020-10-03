@@ -270,7 +270,7 @@ function love.update(dt)
 	end
 	
 	for i, egg in ipairs(spawned_eggs) do
-		egg.x = egg.x - CONVEYOR_SPEED * dt
+		egg.x = egg.x - CONVEYOR_SPEED * dt - love.math.randomNormal(20, 0) * dt
 		if egg.x < 200 then
 			egg.vdown = egg.vdown + GRAVITY * dt
 			egg.y = egg.y + egg.vdown
