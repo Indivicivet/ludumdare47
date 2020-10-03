@@ -136,13 +136,13 @@ function reset_game()
 	eggs_lost = 0
 	eggs_cleared = 0
 	loops_cleared = 0
-	next_egg_timer = NEXT_EGG_TIME
 	
 	basket_eggs_set = {}
 	for i = 1, 5 do
 		basket_eggs_set[#basket_eggs_set + 1] = EGG_TYPES[i]
 	end
 	basket_eggs = new_basket(2)
+	spawn_egg()
 	
 	event_msgs = {{str="begin"}}
 	click_highlights = {}
@@ -289,6 +289,20 @@ function love.draw()
 	draw_cursor()
 end
 
+function spawn_egg()
+	-- used if egg timer runs out or if clear all eggs
+	if #basket_eggs > 0 then
+		spawned_eggs[#spawned_eggs + 1] = {
+			eggtype=basket_eggs[1],
+			x=1000,
+			y=EGG_Y,
+			vdown=0,
+		}
+		table.remove(basket_eggs, 1)
+		next_egg_timer = NEXT_EGG_TIME * (1 + love.math.randomNormal(0.1, 0))
+	end
+end
+
 function love.update(dt)
 	if not started then
 		return
@@ -297,16 +311,7 @@ function love.update(dt)
 	t = t + dt
 	next_egg_timer = next_egg_timer - dt
 	if next_egg_timer < 0 then
-		if #basket_eggs > 0 then
-			spawned_eggs[#spawned_eggs + 1] = {
-				eggtype=basket_eggs[1],
-				x=1000,
-				y=EGG_Y,
-				vdown=0,
-			}
-			table.remove(basket_eggs, 1)
-			next_egg_timer = NEXT_EGG_TIME * (1 + love.math.randomNormal(0.1, 0))
-		end
+		spawn_egg()
 	end
 	
 	for i, event_msg in ipairs(event_msgs) do
@@ -405,11 +410,14 @@ function complete_task()
 	if #spawned_eggs == 0 and #basket_eggs == 0 then
 		loops_cleared = loops_cleared + 1
 		if #tasks >= #task_queue then
+			-- ideally shouldn't hit this
 			started = false
 			return
 		end
 		tasks[#tasks + 1] = task_queue[#tasks + 1]
 		basket_eggs = new_basket(3)
+	elseif #spawned_eggs == 0 then
+		spawn_egg()
 	end
 	reset_task_progress()
 end
