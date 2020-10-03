@@ -9,6 +9,7 @@ function love.load()
 	BIG_FONT = love.graphics.newFont("fonts/VCR_OSD_MONO_1.001.ttf", BASE_FONTSIZE * 2)
 	TITLE_FONT = love.graphics.newFont("fonts/VCR_OSD_MONO_1.001.ttf", BASE_FONTSIZE * 3)
 	HUGE_FONT = love.graphics.newFont("fonts/VCR_OSD_MONO_1.001.ttf", BASE_FONTSIZE * 4)
+	SMALL_FONT = love.graphics.newFont("fonts/VCR_OSD_MONO_1.001.ttf", BASE_FONTSIZE * 0.7)
 	
 	EGG_TYPES = {
 		{col="blue", striped=false, sprite_name="egg_blue_dotty"},
@@ -95,7 +96,7 @@ function love.load()
 	started = false
 	
 	-- for debug, skip splash screen:
-	reset_game()
+	--reset_game()
 end
 
 function reset_task_progress()
@@ -171,6 +172,8 @@ function draw_cursor()
 end
 
 function love.draw()
+	love.graphics.setBackgroundColor(0.25, 0.25, 0.3)
+	
 	if not started then
 		-- splash screen
 		love.graphics.setColor(1, 1, 1)
@@ -190,12 +193,21 @@ function love.draw()
 			love.graphics.printf(line, 0, draw_y, WIDTH, "center")
 			draw_y = draw_y + BASE_FONTSIZE * 1.2
 		end
+		love.graphics.setFont(SMALL_FONT)
+		footnote_lines = {
+			"you can use WASD for tasks requiring arrow usage.",
+			"if not enough eggs are left to complete a task, you will get"
+			.. " free progress towards the task so it's possible."
+		}
+		draw_y = 600
+		for i, line in ipairs(footnote_lines) do
+			love.graphics.printf(line, 0, draw_y, WIDTH, "center")
+			draw_y = draw_y + BASE_FONTSIZE * 1.2 * 0.7
+		end
 		draw_cursor()
 		return
 	end
 	
-	love.graphics.setBackgroundColor(0.25, 0.25, 0.3)
-
 	love.graphics.setFont(BASE_FONT)
 	-- tasks
 	love.graphics.setColor(1, 1, 1)
