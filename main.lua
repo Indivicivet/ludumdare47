@@ -129,3 +129,11 @@ function love.update(dt)
 	end
 end
 
+
+function love.keypressed(key, scancode, isrepeat)
+	-- esc keys isn't going through, maybe being passed to something else
+	-- on my PC at the moment?
+	if key == "escape" then
+		love.event.quit()
+	end
+end
