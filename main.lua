@@ -53,6 +53,10 @@ function love.load()
 			str="click any %s egg!",
 			fmt_col=true,
 		},
+		click_n_eggs={
+			str="click any %d different eggs!",
+			fmt_n=true,
+		},
 	}
 	STATUS = {not_done=0, current=1, done=2}
 	TASK_STATUS_COLOURS = {
@@ -76,6 +80,9 @@ end
 function reset_task_progress()
 	for i, task in ipairs(tasks) do
 		task.status = STATUS.not_done
+		if not (task.progress == nil) then
+			task.progress = 0
+		end
 	end
 	tasks[1].status = STATUS.current
 	current_task_idx = 1
@@ -84,11 +91,12 @@ end
 
 function reset_game()
 	tasks = {
-		{tasktype=TASK_TYPES.click_any_xcol, col="blue"},
-		{tasktype=TASK_TYPES.click_any_xcol, col="green"},
-		{tasktype=TASK_TYPES.click_any_xcol, col="red"},
-		{tasktype=TASK_TYPES.click_next_egg},
+		--{tasktype=TASK_TYPES.click_any_xcol, col="green"},
+		--{tasktype=TASK_TYPES.click_any_xcol, col="red"},
+		{tasktype=TASK_TYPES.click_n_eggs, n=3},
 		{tasktype=TASK_TYPES.click_egg},
+		{tasktype=TASK_TYPES.click_next_egg},
+		{tasktype=TASK_TYPES.click_any_xcol, col="blue"},
 	}
 	
 	spawned_eggs = {}
@@ -146,10 +154,15 @@ function love.draw()
 	for i, task in ipairs(tasks) do
 		love.graphics.setColor(TASK_STATUS_COLOURS[task.status])
 		text_d_y = text_d_y + BASE_FONTSIZE * 1.2
+		task_str = task.tasktype.str
 		if not (task.tasktype.fmt_col == nil) then
-			task_str = task.tasktype.str:format(task.col)
-		else
-			task_str = task.tasktype.str
+			task_str = task_str:format(task.col)
+		end
+		if not (task.tasktype.fmt_n == nil) then
+			task_str = task_str:format(task.n)
+			if not (task.progress == nil) then
+				task_str = task_str .. " (" .. task.progress .. "/" .. task.n .. ")"
+			end
 		end
 		love.graphics.print(task_str, text_d_x, text_d_y)
 		if task.status == STATUS.current and math.floor(t * 2) % 2 == 0 then
@@ -219,19 +232,25 @@ end
 function complete_current_task_if_free()
 	-- call this when we reset tasks or complete_task()s
 	-- some tasks we want to complete for free:
-	if tasks[current_task_idx].tasktype == TASK_TYPES.click_next_egg then
+	current_task = tasks[current_task_idx]
+	if current_task.tasktype == TASK_TYPES.click_next_egg then
 		if #spawned_eggs + #basket_eggs < 2 then
 			complete_task()
 		end
-	elseif tasks[current_task_idx].tasktype == TASK_TYPES.click_any_xcol then
+	elseif current_task.tasktype == TASK_TYPES.click_any_xcol then
 		exists = false
 		for i, egg in ipairs(spawned_eggs) do
-			if egg.eggtype.col == tasks[current_task_idx].col then
+			if egg.eggtype.col == current_task.col then
 				exists = true
 			end
 		end
 		if not exists then
 			complete_task()
+		end
+	elseif current_task.tasktype == TASK_TYPES.click_n_eggs then
+		total_eggs = #spawned_eggs + #basket_eggs
+		if total_eggs < current_task.n then
+			current_task.progress = current_task.n - total_eggs
 		end
 	end
 end
@@ -269,9 +288,12 @@ function love.mousepressed(x, y, button, istouch, presses)
 	if not started then
 		reset_game()
 	end
+	-- inactive
 	if #spawned_eggs == 0 then
 		return
 	end
+	
+	-- see if we had a "clicking on egg" task!
 	current_task = tasks[current_task_idx]
 	if current_task.tasktype == TASK_TYPES.click_egg then
 		if is_in_egg(spawned_eggs[1], x, y) then
@@ -290,7 +312,19 @@ function love.mousepressed(x, y, button, istouch, presses)
 				complete_task()
 			end
 		end
-		
+	elseif current_task.tasktype == TASK_TYPES.click_n_eggs then
+		if current_task.hit_idxs == nil then
+			current_task.hit_idxs = {}
+		end
+		for i, egg in ipairs(spawned_eggs) do
+			if is_in_egg(egg, x, y) then
+				current_task.hit_idxs[i] = true
+			end
+		end
+		current_task.progress = #current_task.hit_idxs
+		if current_task.progress >= current_task.n then
+			complete_task()
+		end
 	end
 end
 
