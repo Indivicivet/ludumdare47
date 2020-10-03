@@ -93,7 +93,7 @@ function love.load()
 	
 	NEXT_EGG_TIME = 1.3
 	CONVEYOR_SPEED = 75
-	GRAVITY = 30
+	GRAVITY = 10
 	EGG_Y = 560
 	EGG_MAXFALL = 100
 	
@@ -295,7 +295,7 @@ function love.draw()
 	end
 	love.graphics.draw(
 		TRASH_CAN,
-		140 - TRASH_SPRITE_MID.x,
+		155 - TRASH_SPRITE_MID.x,
 		EGG_Y + EGG_MAXFALL - TRASH_SPRITE_MID.y
 	)
 	basket_x = 1180
