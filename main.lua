@@ -6,6 +6,7 @@ function love.load()
 
 	BASE_FONTSIZE = 22
 	BASE_FONT = love.graphics.newFont("fonts/VCR_OSD_MONO_1.001.ttf", BASE_FONTSIZE)
+	TITLE_FONT = love.graphics.newFont("fonts/VCR_OSD_MONO_1.001.ttf", BASE_FONTSIZE * 3)
 	
 	EGG_TYPES = {
 		{col="blue", striped=false, sprite_name="egg_blue_dotty"},
@@ -50,7 +51,7 @@ function love.load()
 	started = false
 	
 	-- for debug, skip splash screen:
-	reset_game()
+	--reset_game()
 end
 
 function reset_game()
@@ -73,8 +74,32 @@ function reset_game()
 	started = true
 end
 
+function draw_cursor()
+	mouse_x, mouse_y = love.mouse.getPosition()
+	love.graphics.draw(CURSOR, mouse_x, mouse_y)
+end
+
 function love.draw()
 	if not started then
+		-- splash screen
+		love.graphics.setColor(1, 1, 1)
+		love.graphics.setFont(TITLE_FONT)
+		love.graphics.printf("for egg in basket", 0, 240, WIDTH, "center")
+		love.graphics.setFont(BASE_FONT)
+		splash_lines = {
+			"you are tasked with quality assurance for",
+			"an premium egg manufacturer. for each egg, please",
+			"carefully carry out all of the required assessments.",
+			"if an egg's tasks are not completed, unfortunately",
+			"that egg must be disposed of. click to start.",
+			"good luck!",
+		}
+		draw_y = 320
+		for i, line in ipairs(splash_lines) do
+			love.graphics.printf(line, 0, draw_y, WIDTH, "center")
+			draw_y = draw_y + BASE_FONTSIZE * 1.2
+		end
+		draw_cursor()
 		return
 	end
 	
@@ -120,8 +145,7 @@ function love.draw()
 	love.graphics.print("eggs lost: " .. eggs_lost, 800, 10 + BASE_FONTSIZE*1.2)
 	
 	-- mouse
-	mouse_x, mouse_y = love.mouse.getPosition()
-	love.graphics.draw(CURSOR, mouse_x, mouse_y)
+	draw_cursor()
 end
 
 function love.update(dt)
@@ -153,6 +177,13 @@ function love.update(dt)
 				table.remove(spawned_eggs, i)
 			end
 		end
+	end
+end
+
+
+function love.mousepressed(x, y, button, istouch, presses)
+	if not started then
+		reset_game()
 	end
 end
 
