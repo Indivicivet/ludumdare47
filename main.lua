@@ -66,12 +66,17 @@ function love.load()
 	reset_game()
 end
 
-function reset_game()
-	tasks = {{tasktype=TASK_TYPES.click_egg}, {tasktype=TASK_TYPES.click_egg}}
+function reset_task_progress()
 	for i, task in ipairs(tasks) do
 		task.status = STATUS.not_done
 	end
 	tasks[1].status = STATUS.current
+	current_task_idx = 1
+end
+
+function reset_game()
+	tasks = {{tasktype=TASK_TYPES.click_egg}, {tasktype=TASK_TYPES.click_egg}}
+	reset_task_progress()
 	
 	spawned_eggs = {}
 	t = 0
@@ -192,6 +197,18 @@ function love.update(dt)
 	end
 end
 
+function complete_task()
+	tasks[current_task_idx].status = STATUS.done
+	current_task_idx = current_task_idx + 1
+	if current_task_idx <= #tasks then
+		tasks[current_task_idx].status = STATUS.current
+		return
+	end
+	-- we finished an egg!
+	table.remove(spawned_eggs, 1)
+	reset_task_progress()
+end
+
 
 function is_in_egg(egg, x, y)
 	rel = {x=x - (egg.x - EGG_SPRITE_BOT.x), y=y- (egg.y - EGG_SPRITE_BOT.y)}
@@ -206,13 +223,16 @@ end
 
 
 function love.mousepressed(x, y, button, istouch, presses)
-	for i, egg in ipairs(spawned_eggs) do
-		if is_in_egg(egg, x, y) then
-			--reset_game() -- debug
-		end
-	end
 	if not started then
 		reset_game()
+	end
+	if tasks[current_task_idx].tasktype == TASK_TYPES.click_egg then
+		if #spawned_eggs == 0 then
+			return
+		end
+		if is_in_egg(spawned_eggs[1], x, y) then
+			complete_task()
+		end
 	end
 end
 
