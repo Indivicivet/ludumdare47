@@ -196,8 +196,9 @@ function love.draw()
 	love.graphics.setFont(HUGE_FONT)
 	for i, event_msg in ipairs(event_msgs) do
 		cr, cg, cb = unpack(event_msg.col or {1, 1, 1})
-		love.graphics.setColor(cr, cg, cb, 0.7 * (1 - (event_msg.t or 1)))
-		love.graphics.printf(event_msg.str, 0, 270 + event_msg.t * 10, 1280, "center")
+		event_t = event_msg.t or 1
+		love.graphics.setColor(cr, cg, cb, 0.7 * (1 - event_t))
+		love.graphics.printf(event_msg.str, 0, 270 + event_t * 10, 1280, "center")
 	end
 	
 	-- placeholder conveyor:
