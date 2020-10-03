@@ -142,9 +142,11 @@ function reset_game()
 	
 	basket_eggs_set = {}
 	for i = 1, 5 do
+		-- todo: randomize or something
 		basket_eggs_set[#basket_eggs_set + 1] = EGG_TYPES[i]
 	end
-	basket_eggs = new_basket(2)
+	eggs_per_basket = 2
+	basket_eggs = new_basket(eggs_per_basket)
 	spawn_egg()
 	
 	event_msgs = {{str="begin"}}
@@ -428,7 +430,12 @@ function complete_task()
 			return
 		end
 		tasks[#tasks + 1] = task_queue[#tasks + 1]
-		basket_eggs = new_basket(3)
+		if eggs_per_basket < 8 then
+			eggs_per_basket = eggs_per_basket + 2
+		else
+			eggs_per_basket = eggs_per_basket + 1
+		end
+		basket_eggs = new_basket(eggs_per_basket)
 	elseif #spawned_eggs == 0 then
 		spawn_egg()
 	end
