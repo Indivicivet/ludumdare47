@@ -61,6 +61,8 @@ function love.load()
 end
 
 function love.draw()
+	love.graphics.setBackgroundColor(0.25, 0.25, 0.3)
+
 	love.graphics.setFont(BASE_FONT)
 	-- tasks
 	love.graphics.setColor(1, 1, 1)
