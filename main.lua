@@ -147,7 +147,7 @@ function reset_game()
 	end
 	eggs_per_basket = 2
 	basket_eggs = new_basket(eggs_per_basket)
-	spawn_egg()
+	spawn_egg()  -- sets next_egg_timer
 	
 	event_msgs = {{str="begin"}}
 	
@@ -361,10 +361,10 @@ function love.update(dt)
 			egg.y = egg.y + egg.vdown
 			if egg.y > EGG_Y + EGG_MAXFALL then
 				eggs_lost = eggs_lost + 1
-				table.remove(spawned_eggs, i)
+				remove_first_egg()
 				event_msgs[#event_msgs + 1] = {str="egg failed!", col={1, 0.3, 0.3}}
 				conveyor_moving = false
-				conveyor_reset_timer = 1
+				conveyor_reset_timer = 1.5
 				reset_task_progress()
 			end
 		end
@@ -407,21 +407,9 @@ function setup_current_task()
 	end
 end
 
-function complete_task()
-	current_task.status = STATUS.done
-	current_task_idx = current_task_idx + 1
-	-- still tasks to go
-	if current_task_idx <= #tasks then
-		current_task = tasks[current_task_idx]
-		current_task.status = STATUS.current
-		setup_current_task()
-		event_msgs[#event_msgs + 1] = {str="task completed!"}
-		return
-	end
-	-- no tasks left: we finished an egg!
+
+function remove_first_egg()
 	table.remove(spawned_eggs, 1)
-	event_msgs[#event_msgs + 1] = {str="egg cleared!", col={0.3, 1, 0.4}}
-	eggs_cleared = eggs_cleared + 1
 	if #spawned_eggs == 0 and #basket_eggs == 0 then
 		loops_cleared = loops_cleared + 1
 		if #tasks >= #task_queue then
@@ -439,6 +427,24 @@ function complete_task()
 	elseif #spawned_eggs == 0 then
 		spawn_egg()
 	end
+end
+
+
+function complete_task()
+	current_task.status = STATUS.done
+	current_task_idx = current_task_idx + 1
+	-- still tasks to go
+	if current_task_idx <= #tasks then
+		current_task = tasks[current_task_idx]
+		current_task.status = STATUS.current
+		setup_current_task()
+		event_msgs[#event_msgs + 1] = {str="task completed!"}
+		return
+	end
+	-- no tasks left: we finished an egg!
+	event_msgs[#event_msgs + 1] = {str="egg cleared!", col={0.3, 1, 0.4}}
+	eggs_cleared = eggs_cleared + 1
+	remove_first_egg()
 	reset_task_progress()
 end
 
