@@ -91,8 +91,8 @@ function love.load()
 		[STATUS.done]={0.5, 1, 0.8},
 	}
 	
-	NEXT_EGG_TIME = 1.3
-	CONVEYOR_SPEED = 75
+	NEXT_EGG_TIME = 1.5
+	CONVEYOR_SPEED = 70
 	CONVEYOR_BACKSPEED_RATIO = 0.3
 	GRAVITY = 10
 	EGG_Y = 560
@@ -131,13 +131,19 @@ function reset_game()
 	task_queue = {
 		--{tasktype=TASK_TYPES.click_any_xcol, col="green"},
 		--{tasktype=TASK_TYPES.click_any_xcol, col="red"},
-		--{tasktype=TASK_TYPES.keyseq, seq={"up", "left", "up", "down"}},
 		{tasktype=TASK_TYPES.click_egg},
-		{tasktype=TASK_TYPES.click_n_eggs, n=3},
+		{tasktype=TASK_TYPES.keyseq, seq={"left", "right"}},
+		{tasktype=TASK_TYPES.click_n_eggs, n=2},
+		{tasktype=TASK_TYPES.keyseq, seq={"up", "left", "down"}},
+		{tasktype=TASK_TYPES.click_any_xcol, col="blue"},
+		{tasktype=TASK_TYPES.mash_keys, n=5},
 		{tasktype=TASK_TYPES.click_any_striped},
+		{tasktype=TASK_TYPES.click_any_xcol, col="red"},
+		{tasktype=TASK_TYPES.keyseq, seq={"up", "down", "up", "down", "left"}},
 		{tasktype=TASK_TYPES.mash_keys, n=10},
 		{tasktype=TASK_TYPES.click_next_egg},
-		{tasktype=TASK_TYPES.click_any_xcol, col="blue"},
+		{tasktype=TASK_TYPES.click_n_eggs, n=3},
+		{tasktype=TASK_TYPES.click_any_xcol, col="green"},
 	}
 	
 	tasks = {task_queue[1]}
@@ -149,7 +155,7 @@ function reset_game()
 	loops_cleared = 0
 	
 	basket_eggs_set = {}
-	for i = 1, 5 do
+	for i = 1, 6 do
 		-- todo: randomize or something
 		basket_eggs_set[#basket_eggs_set + 1] = EGG_TYPES[i]
 	end
@@ -462,7 +468,7 @@ function remove_first_egg()
 		end
 		tasks[#tasks + 1] = task_queue[#tasks + 1]
 		if eggs_per_basket < 8 then
-			eggs_per_basket = eggs_per_basket + 2
+			eggs_per_basket = eggs_per_basket + 1 -- was 2 but was 2hard.
 		else
 			eggs_per_basket = eggs_per_basket + 1
 		end
