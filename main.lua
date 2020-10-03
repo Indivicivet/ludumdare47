@@ -402,7 +402,7 @@ function complete_task()
 			return
 		end
 		tasks[#tasks + 1] = task_queue[#tasks + 1]
-		
+		basket_eggs = new_basket(3)
 	end
 end
 
