@@ -38,6 +38,8 @@ function love.load()
 		end
 	end
 	
+	EGG_TICK_BEHIND = love.graphics.newImage("graphics/egg_tick_behind.png")
+	
 	TRASH_CAN = love.graphics.newImage("graphics/trash_can.png")
 	TRASH_SPRITE_MID = {x=64, y=66}
 
@@ -218,7 +220,15 @@ function love.draw()
 		love.graphics.setFont(BIG_FONT)
 		love.graphics.printf("↓", egg.x - 30, egg.y - 150, 60, "center")
 	end
+	love.graphics.setFont(BASE_FONT)
 	for i, egg in ipairs(spawned_eggs) do
+		if current_task.hit_idxs and current_task.hit_idxs[i] then
+			love.graphics.draw(
+				EGG_TICK_BEHIND,
+				egg.x - EGG_SPRITE_BOT.x,
+				egg.y - EGG_SPRITE_BOT.y
+			)
+		end
 		love.graphics.draw(
 			egg.eggtype.sprite,
 			egg.x - EGG_SPRITE_BOT.x,
