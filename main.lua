@@ -102,7 +102,7 @@ function reset_task_progress()
 	tasks[1].status = STATUS.current
 	current_task_idx = 1
 	current_task = tasks[current_task_idx]
-	complete_current_task_if_free()
+	setup_current_task()
 end
 
 function new_basket(n)
@@ -117,7 +117,7 @@ function reset_game()
 	task_queue = {
 		--{tasktype=TASK_TYPES.click_any_xcol, col="green"},
 		--{tasktype=TASK_TYPES.click_any_xcol, col="red"},
-		{tasktype=TASK_TYPES.keyseq, seq={"up", "left", "up", "down"}},
+		--{tasktype=TASK_TYPES.keyseq, seq={"up", "left", "up", "down"}},
 		{tasktype=TASK_TYPES.click_n_eggs, n=3},
 		{tasktype=TASK_TYPES.click_egg},
 		{tasktype=TASK_TYPES.click_next_egg},
@@ -137,7 +137,7 @@ function reset_game()
 	for i = 1, 5 do
 		basket_eggs_set[#basket_eggs_set + 1] = EGG_TYPES[i]
 	end
-	basket_eggs = new_basket(3)
+	basket_eggs = new_basket(2)
 	
 	event_msgs = {{str="begin"}}
 	click_highlights = {}
@@ -346,7 +346,7 @@ function love.update(dt)
 	end
 end
 
-function complete_current_task_if_free()
+function setup_current_task()
 	-- call this when we reset tasks or complete_task()s
 	-- some tasks we want to complete for free:
 	if current_task.tasktype == TASK_TYPES.click_egg then
@@ -369,12 +369,15 @@ function complete_current_task_if_free()
 			complete_task()
 		end
 	elseif current_task.tasktype == TASK_TYPES.click_n_eggs then
+		current_task.excess = 0
+		current_task.hit_idxs = {}
 		total_eggs = #spawned_eggs + #basket_eggs
 		if total_eggs < current_task.n then
-			current_task.progress = current_task.n - total_eggs
-		end
-		if current_task.progress == current_task.n then
-			complete_task()
+			current_task.excess = current_task.n - total_eggs
+			current_task.progress = current_task.excess
+			if current_task.excess == current_task.n then
+				complete_task()
+			end
 		end
 	end
 end
@@ -386,7 +389,7 @@ function complete_task()
 	if current_task_idx <= #tasks then
 		current_task = tasks[current_task_idx]
 		current_task.status = STATUS.current
-		complete_current_task_if_free()
+		setup_current_task()
 		event_msgs[#event_msgs + 1] = {str="task completed!"}
 		return
 	end
@@ -394,7 +397,6 @@ function complete_task()
 	table.remove(spawned_eggs, 1)
 	event_msgs[#event_msgs + 1] = {str="egg cleared!", col={0.3, 1, 0.4}}
 	eggs_cleared = eggs_cleared + 1
-	reset_task_progress()
 	if #spawned_eggs == 0 and #basket_eggs == 0 then
 		loops_cleared = loops_cleared + 1
 		if #tasks >= #task_queue then
@@ -404,6 +406,7 @@ function complete_task()
 		tasks[#tasks + 1] = task_queue[#tasks + 1]
 		basket_eggs = new_basket(3)
 	end
+	reset_task_progress()
 end
 
 
@@ -458,7 +461,7 @@ function love.mousepressed(x, y, button, istouch, presses)
 				current_task.hit_idxs[i] = true
 			end
 		end
-		current_task.progress = #current_task.hit_idxs
+		current_task.progress = #current_task.hit_idxs + (current_task.excess or 0)
 		if current_task.progress >= current_task.n then
 			complete_task()
 		end
