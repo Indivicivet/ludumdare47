@@ -90,6 +90,8 @@ function love.load()
 	EGG_Y = 560
 	EGG_MAXFALL = 100
 	
+	click_highlights = {}  -- applicable for splash draw_cursor()
+	
 	started = false
 	
 	-- for debug, skip splash screen:
@@ -145,7 +147,6 @@ function reset_game()
 	spawn_egg()
 	
 	event_msgs = {{str="begin"}}
-	click_highlights = {}
 	
 	reset_task_progress() -- must call after defining eggs :)
 	started = true
