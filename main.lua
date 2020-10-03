@@ -72,6 +72,10 @@ function love.load()
 			str="press the key sequence! %s",
 			fmt_arrowseq=true,
 		},
+		mash_keys={
+			str="mash any keys!",
+			-- could fmt_n = true if desired
+		},
 	}
 	STATUS = {not_done=0, current=1, done=2}
 	TASK_STATUS_COLOURS = {
@@ -118,6 +122,7 @@ function reset_game()
 		--{tasktype=TASK_TYPES.click_any_xcol, col="green"},
 		--{tasktype=TASK_TYPES.click_any_xcol, col="red"},
 		--{tasktype=TASK_TYPES.keyseq, seq={"up", "left", "up", "down"}},
+		{tasktype=TASK_TYPES.mash_keys, n=10},
 		{tasktype=TASK_TYPES.click_n_eggs, n=3},
 		{tasktype=TASK_TYPES.click_egg},
 		{tasktype=TASK_TYPES.click_next_egg},
@@ -485,6 +490,11 @@ function love.keypressed(key, scancode, isrepeat)
 			current_task.progress = current_task.progress + 1
 		end
 		if current_task.progress == current_task.n then
+			complete_task()
+		end
+	elseif current_task.tasktype == TASK_TYPES.mash_keys then
+		current_task.progress = (current_task.progress or 0) + 1
+		if current_task.progress >= current_task.n then
 			complete_task()
 		end
 	end
