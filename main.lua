@@ -224,6 +224,7 @@ function love.update(dt)
 			if egg.y > EGG_Y + EGG_MAXFALL then
 				eggs_lost = eggs_lost + 1
 				table.remove(spawned_eggs, i)
+				reset_task_progress()
 			end
 		end
 	end
