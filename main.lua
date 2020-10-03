@@ -51,7 +51,7 @@ function love.load()
 	started = false
 	
 	-- for debug, skip splash screen:
-	--reset_game()
+	reset_game()
 end
 
 function reset_game()
