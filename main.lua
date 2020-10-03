@@ -78,8 +78,8 @@ function love.load()
 		[STATUS.done]={0.5, 1, 0.8},
 	}
 	
-	NEXT_EGG_TIME = 1
-	CONVEYOR_SPEED = 100
+	NEXT_EGG_TIME = 1.3
+	CONVEYOR_SPEED = 90
 	GRAVITY = 30
 	EGG_Y = 560
 	EGG_MAXFALL = 100
@@ -268,7 +268,7 @@ function love.update(dt)
 				vdown=0,
 			}
 			table.remove(basket_eggs, 1)
-			next_egg_timer = NEXT_EGG_TIME
+			next_egg_timer = NEXT_EGG_TIME * (1 + love.math.randomNormal(0.1, 0))
 		end
 	end
 	
