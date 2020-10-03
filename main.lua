@@ -55,6 +55,14 @@ function love.load()
 		basket_eggs[#basket_eggs + 1] = EGG_TYPES[i]
 	end
 	
+	TASK_TYPES = {
+		click_egg={
+			str="click the egg!",
+		},
+	}
+	
+	tasks = {TASK_TYPES.click_egg, TASK_TYPES.click_egg}
+	
 	spawned_eggs = {}
 	NEXT_EGG_TIME = 1
 	CONVEYOR_SPEED = 80
@@ -67,9 +75,11 @@ function love.draw()
 	text_d_x = 40
 	text_d_y = 10
 	love.graphics.print("for egg in basket:", text_d_x, text_d_y)
-	text_d_y = text_d_y + BASE_FONTSIZE * 1.2
 	text_d_x = text_d_x + 50 -- tab in
-	love.graphics.print("click the egg!", text_d_x, text_d_y)
+	for i, task in ipairs(tasks) do
+		text_d_y = text_d_y + BASE_FONTSIZE * 1.2
+		love.graphics.print(task.str, text_d_x, text_d_y)
+	end
 	for i, egg in ipairs(spawned_eggs) do
 		love.graphics.draw(egg.eggtype.sprite, egg.x, egg.y)
 	end
