@@ -50,14 +50,17 @@ function love.load()
 		)
 	end
 	
-	eggs = {}
+	basket_eggs = {}
 	for i = 1, 5 do
-		eggs[#eggs + 1] = {
+		basket_eggs[#basket_eggs + 1] = {
 			spawned=false,
 			eggtype=EGG_TYPES[i],
 		}
 	end
-	next_egg_timer = 1
+	
+	spawned_eggs = {}
+	NEXT_EGG_TIME = 1
+	next_egg_timer = NEXT_EGG_TIME
 end
 
 function love.draw()
@@ -69,15 +72,21 @@ function love.draw()
 	text_d_y = text_d_y + BASE_FONTSIZE * 1.2
 	text_d_x = text_d_x + 50 -- tab in
 	love.graphics.print("click the egg!", text_d_x, text_d_y)
-	egg_d_y = 500
 	egg_d_x = 50
-	for i, egg in ipairs(eggs) do
+	egg_d_y = 500
+	for i, egg in ipairs(spawned_eggs) do
 		love.graphics.draw(egg.eggtype.sprite, egg_d_x, egg_d_y)
 		egg_d_x = egg_d_x + 150
 	end
+	love.graphics.print("eggs left in basket: " .. #basket_eggs, 800, 10)
 end
 
 function love.update(dt)
-	
+	next_egg_timer = next_egg_timer - dt
+	if next_egg_timer < 0 then
+		spawned_eggs[#spawned_eggs + 1] = basket_eggs[1]
+		table.remove(basket_eggs, 1)
+		next_egg_timer = NEXT_EGG_TIME
+	end
 end
 
