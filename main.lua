@@ -114,7 +114,7 @@ function love.load()
 	
 	-- main difficulty options:
 	NEXT_EGG_TIME = 1.6
-	CONVEYOR_SPEED = 70
+	CONVEYOR_SPEED = 60
 	CONVEYOR_BACKSPEED_RATIO = 0.7
 	MAX_LIVES = 4
 	
