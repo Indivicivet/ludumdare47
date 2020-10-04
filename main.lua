@@ -60,6 +60,11 @@ function love.load()
 	CURSOR = love.graphics.newImage("graphics/cursor.png")
 	love.mouse.setVisible(false)
 	
+	DEAD_EGG = love.audio.newSource("sound/dead_egg.wav", "static")
+	FINISH_TASK = love.audio.newSource("sound/finish_task.wav", "static")
+	FINISH_EGG = love.audio.newSource("sound/finish_egg.wav", "static")
+	FINISH_BASKET = love.audio.newSource("sound/finish_basket.wav", "static")
+	
 	ARROW_CHARS = {right="→", up="↑", down="↓", left="←"}
 	WASD = {right="d", up="w", down="s", left="a"}
 	
@@ -398,6 +403,7 @@ function love.update(dt)
 				eggs_lost = eggs_lost + 1
 				remove_first_egg()
 				event_msgs[#event_msgs + 1] = {str="egg failed!", col={1, 0.3, 0.3}}
+				DEAD_EGG:play()
 				conveyor_moving = false
 				conveyor_reset_timer = 1.5
 				reset_task_progress()
@@ -473,6 +479,8 @@ function remove_first_egg()
 			eggs_per_basket = eggs_per_basket + 1
 		end
 		basket_eggs = new_basket(eggs_per_basket)
+		event_msgs[#event_msgs + 1] = {str="basket cleared!", col={0.3, 1, 0.4}}
+		FINISH_BASKET:play()
 	elseif #spawned_eggs == 0 then
 		spawn_egg()
 	end
@@ -488,11 +496,13 @@ function complete_task()
 		current_task.status = STATUS.current
 		setup_current_task()
 		event_msgs[#event_msgs + 1] = {str="task completed!"}
+		FINISH_TASK:play()
 		return
 	end
 	-- no tasks left: we finished an egg!
 	event_msgs[#event_msgs + 1] = {str="egg cleared!", col={0.3, 1, 0.4}}
 	eggs_cleared = eggs_cleared + 1
+	FINISH_EGG:play()
 	remove_first_egg()
 	reset_task_progress()
 end
