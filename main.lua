@@ -110,7 +110,7 @@ function love.load()
 	EGG_Y = 560
 	EGG_MAXFALL = 100
 	MAX_TASKS = 12
-	MAX_LIVES = 3
+	MAX_LIVES = 4
 	
 	SCREEN = {splash=1, game=2, fadeout=3, scores=4}
 	FADEOUT_TIME = 1.5
