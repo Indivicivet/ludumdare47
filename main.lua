@@ -70,7 +70,7 @@ function love.load()
 	EGG_SPAWN = love.audio.newSource("sound/egg_spawn.wav", "static")
 	
 	CONVEYOR_BACKWARDS = love.audio.newSource("sound/conveyor_backwards.wav", "static")
-	CONVEYOR_BACKWARDS_TIME = 0.35
+	CONVEYOR_BACKWARDS_SOUND_TIME = 0.35
 	
 	ARROW_CHARS = {right="→", up="↑", down="↓", left="←"}
 	WASD = {right="d", up="w", down="s", left="a"}
@@ -103,18 +103,20 @@ function love.load()
 		[STATUS.done]={0.5, 1, 0.8},
 	}
 	
-	NEXT_EGG_TIME = 1.5
-	CONVEYOR_SPEED = 70
-	CONVEYOR_BACKSPEED_RATIO = 0.6
 	GRAVITY = 10
 	EGG_Y = 560
 	EGG_MAXFALL = 100
 	MAX_TASKS = 12
-	MAX_LIVES = 4
 	
 	SCREEN = {splash=1, game=2, fadeout=3, scores=4}
 	FADEOUT_TIME = 1.5
 	SCORE_FADEIN_TIME = 0.5
+	
+	-- main difficulty options:
+	NEXT_EGG_TIME = 1.6
+	CONVEYOR_SPEED = 70
+	CONVEYOR_BACKSPEED_RATIO = 0.7
+	MAX_LIVES = 4
 	
 	click_highlights = {}  -- applicable for splash draw_cursor()
 	
@@ -598,7 +600,7 @@ function love.update(dt)
 	if not conveyor_moving then
 		-- sound stuff
 		conveyor_back_sound_t = conveyor_back_sound_t + dt
-		if conveyor_back_sound_t >= CONVEYOR_BACKWARDS_TIME then
+		if conveyor_back_sound_t >= CONVEYOR_BACKWARDS_SOUND_TIME then
 			conveyor_back_sound_t = 0
 			CONVEYOR_BACKWARDS:play()
 		end
