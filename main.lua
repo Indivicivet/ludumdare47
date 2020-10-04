@@ -167,6 +167,7 @@ function reset_game()
 	tasks = {task_queue[1]}
 	
 	spawned_eggs = {}
+	fadeout_eggs = {}
 	t = 0
 	eggs_lost = 0
 	eggs_cleared = 0
@@ -328,16 +329,30 @@ function love.draw()
 		love.graphics.printf(event_msg.str, 0, 270 + event_d_y + event_t * 10, 1280, "center")
 	end
 	
-	-- eggs
+	-- eggs fading out
+	for i, egg in ipairs(fadeout_eggs) do
+		love.graphics.setColor(1, 1, 1, egg.alpha or 0.95)
+		love.graphics.draw(
+			egg.eggtype.sprite,
+			egg.x - EGG_SPRITE_BOT.x,
+			egg.y - EGG_SPRITE_BOT.y
+		)
+	end
+	
+	-- current egg highlighter
 	love.graphics.setColor(1, 1, 1)
 	if #spawned_eggs >= 1 then
 		egg = spawned_eggs[1]
 		love.graphics.setFont(BIG_FONT)
 		love.graphics.printf("↓", egg.x - 30, egg.y - 150, 60, "center")
 	end
+	
+	-- conveyor
 	conv_frame_num = math.floor(conveyor_t * CONVEYOR_SPEED / 4) % #CONVEYOR_FRAMES
 	love.graphics.draw(CONVEYOR_FRAMES[conv_frame_num], 210, EGG_Y - 5)
 	love.graphics.setFont(BASE_FONT)
+	
+	-- eggs
 	for i, egg in ipairs(spawned_eggs) do
 		love.graphics.draw(
 			egg.eggtype.sprite,
@@ -464,6 +479,13 @@ function love.update(dt)
 		click.t = click.t + dt
 		if click.t > 0.3 then
 			table.remove(click_highlights, i)
+		end
+	end
+	
+	for i, egg in ipairs(fadeout_eggs) do
+		egg.alpha = (egg.alpha or 1) - 3 * dt
+		if egg.alpha < 0 then
+			table.remove(fadeout_eggs[i])
 		end
 	end
 	
@@ -610,6 +632,7 @@ function complete_task()
 	event_msgs[#event_msgs + 1] = {str="egg cleared!", col={0.3, 1, 0.4}}
 	eggs_cleared = eggs_cleared + 1
 	FINISH_EGG:play()
+	fadeout_eggs[#fadeout_eggs + 1] = spawned_eggs[1]
 	remove_first_egg()
 	reset_task_progress()
 end
