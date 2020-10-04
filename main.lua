@@ -617,6 +617,9 @@ end
 
 function remove_first_egg()
 	table.remove(spawned_eggs, 1)
+	if lives == 0 then
+		return
+	end
 	if #spawned_eggs == 0 and #basket_eggs == 0 then
 		baskets_cleared = baskets_cleared + 1
 		if #tasks >= #task_queue then
@@ -632,7 +635,7 @@ function remove_first_egg()
 		end
 		basket_eggs = new_basket(eggs_per_basket)
 		event_msgs[#event_msgs + 1] = {str="basket cleared!", col={0.3, 1, 0.4}}
-		if lives < MAX_LIVES and lives > 0 then
+		if lives < MAX_LIVES then
 			lives = lives + 1
 		end
 		FINISH_BASKET:play()
