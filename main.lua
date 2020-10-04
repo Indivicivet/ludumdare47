@@ -122,9 +122,10 @@ end
 function reset_task_progress()
 	for i, task in ipairs(tasks) do
 		task.status = STATUS.not_done
-		if not (task.progress == nil) then
-			task.progress = 0
-		end
+		task.progress = nil
+		--if not (task.progress == nil) then
+		--	task.progress = 0
+		--end
 	end
 	tasks[1].status = STATUS.current
 	current_task_idx = 1
