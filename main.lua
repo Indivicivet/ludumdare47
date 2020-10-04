@@ -99,7 +99,7 @@ function love.load()
 	}
 	
 	NEXT_EGG_TIME = 1.5
-	CONVEYOR_SPEED = 700
+	CONVEYOR_SPEED = 70
 	CONVEYOR_BACKSPEED_RATIO = 0.4
 	GRAVITY = 10
 	EGG_Y = 560
@@ -108,6 +108,7 @@ function love.load()
 	
 	SCREEN = {splash=1, game=2, fadeout=3, scores=4}
 	FADEOUT_TIME = 1.5
+	SCORE_FADEIN_TIME = 0.5
 	
 	click_highlights = {}  -- applicable for splash draw_cursor()
 	
@@ -186,6 +187,54 @@ function reset_game()
 	conveyor_reset_timer = 0
 end
 
+function draw_tasks(offset_x, offset_y)
+	-- used ingame and in scores screen
+	love.graphics.setFont(BASE_FONT)
+	love.graphics.setColor(1, 1, 1)
+	text_d_x = 50 + (offset_x or 0)
+	text_d_y = 40 + (offset_y or 0)
+	love.graphics.print("for egg in basket:", text_d_x, text_d_y)
+	text_d_x = text_d_x + 50 -- tab in
+	for i, task in ipairs(tasks) do
+		love.graphics.setColor(TASK_STATUS_COLOURS[task.status] or {1, 1, 1})
+		text_d_y = text_d_y + BASE_FONTSIZE * 1.25
+		task_str = task.tasktype.str
+		if not (task.tasktype.fmt_col == nil) then
+			task_str = task_str:format(task.col)
+		end
+		if not (task.tasktype.fmt_n == nil) then
+			task_str = task_str:format(task.n)
+		end
+		if not (task.tasktype.fmt_arrowseq == nil) then
+			arr_str = ""
+			for j, dir in ipairs(task.seq) do
+				arr_str = arr_str .. ARROW_CHARS[dir]
+			end
+			task_str = task_str:format(arr_str)
+		end
+		if not (task.progress == nil) then
+			task_str = task_str .. " (" .. task.progress .. "/" .. task.n .. ")"
+		end
+		love.graphics.print(task_str, text_d_x, text_d_y)
+		if task.status == STATUS.current and math.floor(t * 2) % 2 == 0 then
+			love.graphics.print(">", text_d_x - 25, text_d_y)
+		end
+	end
+end
+
+function draw_stats(offset_x, offset_y)
+	-- used ingame and on scores page
+	love.graphics.setColor(1, 1, 1)
+	love.graphics.setFont(BASE_FONT)
+	text_d_x = 800 + (offset_x or 0)
+	text_d_y = 200 + (offset_y or 0)
+	love.graphics.print("eggs lost: " .. eggs_lost, text_d_x, text_d_y)
+	text_d_y = text_d_y + BASE_FONTSIZE * 1.25
+	love.graphics.print("eggs cleared: " .. eggs_cleared, text_d_x, text_d_y)
+	text_d_y = text_d_y + BASE_FONTSIZE * 1.25
+	love.graphics.print("loops cleared: " .. loops_cleared, text_d_x, text_d_y)
+end
+
 function draw_cursor()
 	-- used in both splash screen and ingame
 	love.graphics.setColor(1, 1, 1, 0.5)
@@ -239,6 +288,15 @@ function love.draw()
 	end
 	
 	if screen == SCREEN.scores then
+		love.graphics.setFont(BIG_FONT)
+		love.graphics.setColor(1, 1, 1)
+		love.graphics.print("final loop:", 100, 150)
+		draw_tasks(50, 200)
+		draw_stats(0, 0)
+		if fade_t < SCORE_FADEIN_TIME then
+			love.graphics.setColor(0, 0, 0, 1 - (fade_t / SCORE_FADEIN_TIME))
+			love.graphics.rectangle("fill", 0, 0, WIDTH, HEIGHT)
+		end
 		draw_cursor()
 		return
 	end
@@ -248,37 +306,7 @@ function love.draw()
 	love.graphics.draw(BACKGROUND)
 	
 	-- tasks
-	love.graphics.setFont(BASE_FONT)
-	love.graphics.setColor(1, 1, 1)
-	text_d_x = 50
-	text_d_y = 40
-	love.graphics.print("for egg in basket:", text_d_x, text_d_y)
-	text_d_x = text_d_x + 50 -- tab in
-	for i, task in ipairs(tasks) do
-		love.graphics.setColor(TASK_STATUS_COLOURS[task.status] or {1, 1, 1})
-		text_d_y = text_d_y + BASE_FONTSIZE * 1.25
-		task_str = task.tasktype.str
-		if not (task.tasktype.fmt_col == nil) then
-			task_str = task_str:format(task.col)
-		end
-		if not (task.tasktype.fmt_n == nil) then
-			task_str = task_str:format(task.n)
-		end
-		if not (task.tasktype.fmt_arrowseq == nil) then
-			arr_str = ""
-			for j, dir in ipairs(task.seq) do
-				arr_str = arr_str .. ARROW_CHARS[dir]
-			end
-			task_str = task_str:format(arr_str)
-		end
-		if not (task.progress == nil) then
-			task_str = task_str .. " (" .. task.progress .. "/" .. task.n .. ")"
-		end
-		love.graphics.print(task_str, text_d_x, text_d_y)
-		if task.status == STATUS.current and math.floor(t * 2) % 2 == 0 then
-			love.graphics.print(">", text_d_x - 25, text_d_y)
-		end
-	end
+	draw_tasks()
 	
 	-- print events
 	love.graphics.setFont(HUGE_FONT)
@@ -352,23 +380,15 @@ function love.draw()
 	end
 	
 	-- status gui
-	love.graphics.setColor(1, 1, 1)
-	love.graphics.setFont(BASE_FONT)
-	text_d_x = 800
-	text_d_y = 200
-	love.graphics.print("eggs lost: " .. eggs_lost, text_d_x, text_d_y)
-	text_d_y = text_d_y + BASE_FONTSIZE * 1.25
-	love.graphics.print("eggs cleared: " .. eggs_cleared, text_d_x, text_d_y)
-	text_d_y = text_d_y + BASE_FONTSIZE * 1.25
-	love.graphics.print("loops cleared: " .. loops_cleared, text_d_x, text_d_y)
+	draw_stats()
 	
 	-- screen fadeout
 	if screen == SCREEN.fadeout then
-		love.graphics.setColor(1, 0.3, 0.3, 0.8)
-		love.graphics.setFont(HUGE_FONT)
-		love.graphics.printf("game over...", 0, 300, WIDTH, "center")
 		love.graphics.setColor(0, 0, 0, fade_t/FADEOUT_TIME)
 		love.graphics.rectangle("fill", 0, 0, WIDTH, HEIGHT)
+		love.graphics.setColor(1, 0.3, 0.3)
+		love.graphics.setFont(HUGE_FONT)
+		love.graphics.printf("game over...", 0, 300, WIDTH, "center")
 	end
 	
 	-- mouse
@@ -393,7 +413,12 @@ function spawn_egg()
 end
 
 function love.update(dt)
-	if screen == SCREEN.splash or screen == SCREEN.scores then
+	if screen == SCREEN.splash then
+		return
+	end
+	
+	if screen == SCREEN.scores then
+		fade_t = fade_t + dt
 		return
 	end
 	
@@ -401,6 +426,7 @@ function love.update(dt)
 		fade_t = fade_t + dt
 		if fade_t >= FADEOUT_TIME then
 			screen = SCREEN.scores
+			fade_t = 0
 		end
 	end
 	
@@ -450,6 +476,10 @@ function love.update(dt)
 			egg.vdown = egg.vdown + GRAVITY * dt
 			egg.y = egg.y + egg.vdown
 			if egg.y > EGG_Y + EGG_MAXFALL then
+				if screen ~= SCREEN.game then
+					table.remove(spawned_eggs, 1)
+					return
+				end
 				eggs_lost = eggs_lost + 1
 				lives = lives - 1
 				remove_first_egg()
