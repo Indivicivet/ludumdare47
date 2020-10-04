@@ -119,6 +119,10 @@ function love.load()
 	screen = SCREEN.splash
 	fade_t = 0
 	
+	MUSIC = love.audio.newSource("sound/bgmusic.mp3", "stream")
+	MUSIC:setLooping(true)
+	MUSIC:play()
+	
 	-- for debug, skip splash screen:
 	--reset_game()
 end
