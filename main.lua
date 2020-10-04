@@ -67,6 +67,9 @@ function love.load()
 	FINISH_EGG = love.audio.newSource("sound/finish_egg.wav", "static")
 	FINISH_BASKET = love.audio.newSource("sound/finish_basket.wav", "static")
 	
+	CONVEYOR_BACKWARDS = love.audio.newSource("sound/conveyor_backwards.wav", "static")
+	CONVEYOR_BACKWARDS_TIME = 0.35
+	
 	ARROW_CHARS = {right="→", up="↑", down="↓", left="←"}
 	WASD = {right="d", up="w", down="s", left="a"}
 	
@@ -186,6 +189,7 @@ function reset_game()
 	conveyor_moving = true
 	conveyor_t = 0 -- for conveyor sprite
 	conveyor_reset_timer = 0
+	conveyor_back_sound_t = 0
 end
 
 function draw_tasks(offset_x, offset_y)
@@ -462,6 +466,14 @@ function love.update(dt)
 	
 	-- move eggs; first we block on the conveyor being active
 	if not conveyor_moving then
+		-- sound stuff
+		conveyor_back_sound_t = conveyor_back_sound_t + dt
+		if conveyor_back_sound_t >= CONVEYOR_BACKWARDS_TIME then
+			conveyor_back_sound_t = 0
+			CONVEYOR_BACKWARDS:play()
+		end
+		
+		-- gameplay stuff
 		conveyor_reset_timer = conveyor_reset_timer - dt
 		if conveyor_reset_timer <= 0 then
 			conveyor_moving = true
