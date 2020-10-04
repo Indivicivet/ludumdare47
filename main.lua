@@ -228,9 +228,9 @@ function draw_stats(offset_x, offset_y)
 	love.graphics.setFont(BASE_FONT)
 	text_d_x = 800 + (offset_x or 0)
 	text_d_y = 200 + (offset_y or 0)
-	love.graphics.print("eggs lost: " .. eggs_lost, text_d_x, text_d_y)
-	text_d_y = text_d_y + BASE_FONTSIZE * 1.25
 	love.graphics.print("eggs cleared: " .. eggs_cleared, text_d_x, text_d_y)
+	text_d_y = text_d_y + BASE_FONTSIZE * 1.25
+	love.graphics.print("eggs lost: " .. eggs_lost, text_d_x, text_d_y)
 	text_d_y = text_d_y + BASE_FONTSIZE * 1.25
 	love.graphics.print("baskets cleared: " .. baskets_cleared, text_d_x, text_d_y)
 end
