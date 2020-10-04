@@ -505,6 +505,9 @@ function remove_first_egg()
 		end
 		basket_eggs = new_basket(eggs_per_basket)
 		event_msgs[#event_msgs + 1] = {str="basket cleared!", col={0.3, 1, 0.4}}
+		if lives < MAX_LIVES then
+			lives = lives + 1
+		end
 		FINISH_BASKET:play()
 	elseif #spawned_eggs == 0 then
 		spawn_egg()
