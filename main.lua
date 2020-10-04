@@ -109,6 +109,7 @@ function love.load()
 	GRAVITY = 10
 	EGG_Y = 560
 	EGG_MAXFALL = 100
+	MAX_TASKS = 12
 	MAX_LIVES = 3
 	
 	SCREEN = {splash=1, game=2, fadeout=3, scores=4}
@@ -152,24 +153,60 @@ function new_basket(n)
 	return bask
 end
 
+function pop_random(tab)
+	selected = love.math.random(#tab)
+	result = tab[selected]
+	table.remove(tab, selected)
+	return result
+end
+
 function reset_game()
-	task_queue = {
-		--{tasktype=TASK_TYPES.click_any_xcol, col="green"},
-		--{tasktype=TASK_TYPES.click_any_xcol, col="red"},
+	-- tasks can appear with duplicates; makes them more likely to be
+	-- picked, because is otherwise uniformly at random
+	EASY_TASKS = {
 		{tasktype=TASK_TYPES.click_egg},
-		{tasktype=TASK_TYPES.keyseq, seq={"left", "right"}},
 		{tasktype=TASK_TYPES.click_n_eggs, n=2},
-		{tasktype=TASK_TYPES.keyseq, seq={"up", "left", "down"}},
-		{tasktype=TASK_TYPES.click_any_xcol, col="blue"},
-		{tasktype=TASK_TYPES.mash_keys, n=5},
+		{tasktype=TASK_TYPES.keyseq, seq={"left"}},
+		{tasktype=TASK_TYPES.keyseq, seq={"down", "up"}},
+		{tasktype=TASK_TYPES.keyseq, seq={"left", "right"}},
+		{tasktype=TASK_TYPES.mash_keys, n=3},
+		{tasktype=TASK_TYPES.click_next_egg},
+		{tasktype=TASK_TYPES.click_next_egg},
+	}
+	
+	MEDIUM_TASKS = {
 		{tasktype=TASK_TYPES.click_any_striped},
 		{tasktype=TASK_TYPES.click_any_xcol, col="red"},
-		{tasktype=TASK_TYPES.keyseq, seq={"up", "down", "up", "down", "left"}},
-		{tasktype=TASK_TYPES.mash_keys, n=10},
-		{tasktype=TASK_TYPES.click_next_egg},
-		{tasktype=TASK_TYPES.click_n_eggs, n=3},
+		{tasktype=TASK_TYPES.click_any_xcol, col="blue"},
 		{tasktype=TASK_TYPES.click_any_xcol, col="green"},
+		{tasktype=TASK_TYPES.keyseq, seq={"up", "left", "down"}},
+		{tasktype=TASK_TYPES.keyseq, seq={"up", "left", "up", "down"}},
+		{tasktype=TASK_TYPES.mash_keys, n=5},
+		{tasktype=TASK_TYPES.click_n_eggs, n=3},
 	}
+	
+	HARD_TASKS = {
+		{tasktype=TASK_TYPES.keyseq, seq={"up", "down", "up", "down", "left"}},
+		{tasktype=TASK_TYPES.keyseq, seq={"left", "down", "left", "down", "up"}},
+		{tasktype=TASK_TYPES.keyseq, seq={"up", "down", "left", "right", "up"}},
+		{tasktype=TASK_TYPES.mash_keys, n=15},
+		{tasktype=TASK_TYPES.click_n_eggs, n=4},
+		{tasktype=TASK_TYPES.keyseq, seq={
+			"up", "up", "down", "down", "left", "right", "left", "right"
+		}},
+	}
+	
+	task_queue = {}
+	task_queue[1] = {tasktype=TASK_TYPES.click_egg}
+	for i = 2, MAX_TASKS do
+		if i <= 3 or (i % 2 == 1) then
+			task_queue[i] = pop_random(EASY_TASKS)
+		elseif i <= 7 then
+			task_queue[i] = pop_random(MEDIUM_TASKS)
+		else
+			task_queue[i] = pop_random(HARD_TASKS)
+		end
+	end
 	
 	tasks = {task_queue[1]}
 	
@@ -194,6 +231,7 @@ function reset_game()
 	
 	reset_task_progress() -- must call after defining eggs :)
 	screen = SCREEN.game
+	won = false
 	
 	conveyor_moving = true
 	conveyor_t = 0 -- for conveyor sprite
@@ -436,9 +474,14 @@ function love.draw()
 	if screen == SCREEN.fadeout then
 		love.graphics.setColor(0, 0, 0, fade_t/FADEOUT_TIME)
 		love.graphics.rectangle("fill", 0, 0, WIDTH, HEIGHT)
-		love.graphics.setColor(1, 0.3, 0.3)
 		love.graphics.setFont(HUGE_FONT)
-		love.graphics.printf("game over...", 0, 300, WIDTH, "center")
+		if won then
+			love.graphics.setColor(0.3, 1, 0.4)
+			love.graphics.printf("congratulations!", 0, 300, WIDTH, "center")
+		else
+			love.graphics.setColor(1, 0.3, 0.3)
+			love.graphics.printf("game over...", 0, 300, WIDTH, "center")
+		end
 	end
 	
 	-- mouse
@@ -633,9 +676,10 @@ function remove_first_egg()
 	end
 	if #spawned_eggs == 0 and #basket_eggs == 0 then
 		baskets_cleared = baskets_cleared + 1
-		if #tasks >= #task_queue then
-			-- ideally shouldn't hit this
+		if #tasks >= #task_queue then			
+			--event_msgs[#event_msgs + 1] = {str="all tasks cleared!", col={0.3, 1, 0.4}}
 			screen = SCREEN.fadeout
+			won = true -- YOU WON
 			return
 		end
 		tasks[#tasks + 1] = task_queue[#tasks + 1]
