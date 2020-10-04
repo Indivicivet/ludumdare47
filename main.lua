@@ -66,6 +66,7 @@ function love.load()
 	FINISH_TASK = love.audio.newSource("sound/finish_task.wav", "static")
 	FINISH_EGG = love.audio.newSource("sound/finish_egg.wav", "static")
 	FINISH_BASKET = love.audio.newSource("sound/finish_basket.wav", "static")
+	EGG_SPAWN = love.audio.newSource("sound/egg_spawn.wav", "static")
 	
 	CONVEYOR_BACKWARDS = love.audio.newSource("sound/conveyor_backwards.wav", "static")
 	CONVEYOR_BACKWARDS_TIME = 0.35
@@ -407,6 +408,7 @@ function spawn_egg()
 		return
 	end
 	if #basket_eggs > 0 then
+		EGG_SPAWN:play()
 		spawned_eggs[#spawned_eggs + 1] = {
 			eggtype=basket_eggs[1],
 			x=1000,
