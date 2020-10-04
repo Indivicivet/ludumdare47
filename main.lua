@@ -415,7 +415,7 @@ function love.draw()
 		else
 			love.graphics.draw(EGG_LIFE_CRACKED, life_d_x, life_d_y)
 		end
-		life_d_x = life_d_x + 50
+		life_d_x = life_d_x + 60
 	end
 	
 	-- status gui
