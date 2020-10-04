@@ -720,6 +720,21 @@ function love.keypressed(key, scancode, isrepeat)
 		love.event.quit()
 	end
 	
+	if (
+		key == "m"
+		and not (
+			screen == SCREEN.game
+			and current_task.tasktype == TASK_TYPES.mash_keys
+		)
+	) then
+		if MUSIC:isPlaying() then
+			MUSIC:pause()
+		else
+			MUSIC:play()
+		end
+	end
+	
+	
 	if screen ~= SCREEN.game then
 		return
 	end
