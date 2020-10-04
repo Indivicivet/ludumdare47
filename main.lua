@@ -99,16 +99,20 @@ function love.load()
 	}
 	
 	NEXT_EGG_TIME = 1.5
-	CONVEYOR_SPEED = 70
+	CONVEYOR_SPEED = 700
 	CONVEYOR_BACKSPEED_RATIO = 0.4
 	GRAVITY = 10
 	EGG_Y = 560
 	EGG_MAXFALL = 100
 	MAX_LIVES = 3
 	
+	SCREEN = {splash=1, game=2, fadeout=3, scores=4}
+	FADEOUT_TIME = 1.5
+	
 	click_highlights = {}  -- applicable for splash draw_cursor()
 	
-	started = false
+	screen = SCREEN.splash
+	fade_t = 0
 	
 	-- for debug, skip splash screen:
 	--reset_game()
@@ -175,7 +179,7 @@ function reset_game()
 	event_msgs = {{str="begin"}}
 	
 	reset_task_progress() -- must call after defining eggs :)
-	started = true
+	screen = SCREEN.game
 	
 	conveyor_moving = true
 	conveyor_t = 0 -- for conveyor sprite
@@ -200,7 +204,7 @@ end
 function love.draw()
 	love.graphics.setBackgroundColor(0.25, 0.25, 0.3)
 	
-	if not started then
+	if screen == SCREEN.splash then
 		-- splash screen
 		love.graphics.setColor(1, 1, 1)
 		love.graphics.setFont(TITLE_FONT)
@@ -234,6 +238,12 @@ function love.draw()
 		return
 	end
 	
+	if screen == SCREEN.scores then
+		draw_cursor()
+		return
+	end
+	
+	-- otherwise, we're ingame or fading out
 	love.graphics.setColor(1, 1, 1)
 	love.graphics.draw(BACKGROUND)
 	
@@ -274,7 +284,7 @@ function love.draw()
 	love.graphics.setFont(HUGE_FONT)
 	for i, event_msg in ipairs(event_msgs) do
 		if i > 1 and (event_msg.d_y == nil) then
-			event_msg.d_y = love.math.random(-30, 30)
+			event_msg.d_y = love.math.random(-50, 50)
 		end
 		cr, cg, cb = unpack(event_msg.col or {1, 1, 1})
 		event_t = event_msg.t or 1
@@ -283,7 +293,7 @@ function love.draw()
 		love.graphics.printf(event_msg.str, 0, 270 + event_d_y + event_t * 10, 1280, "center")
 	end
 	
-	-- sprites
+	-- eggs
 	love.graphics.setColor(1, 1, 1)
 	if #spawned_eggs >= 1 then
 		egg = spawned_eggs[1]
@@ -352,6 +362,15 @@ function love.draw()
 	text_d_y = text_d_y + BASE_FONTSIZE * 1.25
 	love.graphics.print("loops cleared: " .. loops_cleared, text_d_x, text_d_y)
 	
+	-- screen fadeout
+	if screen == SCREEN.fadeout then
+		love.graphics.setColor(1, 0.3, 0.3, 0.8)
+		love.graphics.setFont(HUGE_FONT)
+		love.graphics.printf("game over...", 0, 300, WIDTH, "center")
+		love.graphics.setColor(0, 0, 0, fade_t/FADEOUT_TIME)
+		love.graphics.rectangle("fill", 0, 0, WIDTH, HEIGHT)
+	end
+	
 	-- mouse
 	draw_cursor()
 end
@@ -374,8 +393,15 @@ function spawn_egg()
 end
 
 function love.update(dt)
-	if not started then
+	if screen == SCREEN.splash or screen == SCREEN.scores then
 		return
+	end
+	
+	if screen == SCREEN.fadeout then
+		fade_t = fade_t + dt
+		if fade_t >= FADEOUT_TIME then
+			screen = SCREEN.scores
+		end
 	end
 	
 	t = t + dt
@@ -431,7 +457,14 @@ function love.update(dt)
 				DEAD_EGG:play()
 				conveyor_moving = false
 				conveyor_reset_timer = 1.5
-				reset_task_progress()
+				if lives > 0 then
+					reset_task_progress()
+				else
+					--event_msgs[#event_msgs + 1] = {str="game over...", col={1, 0.5, 0.5}}
+					--GAME_OVER:play()
+					screen = SCREEN.fadeout
+					fade_t = 0
+				end
 			end
 		end
 	end
@@ -494,7 +527,7 @@ function remove_first_egg()
 		loops_cleared = loops_cleared + 1
 		if #tasks >= #task_queue then
 			-- ideally shouldn't hit this
-			started = false
+			screen = SCREEN.fadeout
 			return
 		end
 		tasks[#tasks + 1] = task_queue[#tasks + 1]
@@ -549,7 +582,7 @@ end
 
 
 function love.mousepressed(x, y, button, istouch, presses)
-	if not started then
+	if screen == SCREEN.splash or screen == SCREEN.scores then
 		reset_game()
 	end
 	
@@ -606,7 +639,7 @@ function love.keypressed(key, scancode, isrepeat)
 		love.event.quit()
 	end
 	
-	if not started then
+	if screen ~= SCREEN.game then
 		return
 	end
 	
