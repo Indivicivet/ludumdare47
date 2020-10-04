@@ -44,6 +44,8 @@ function love.load()
 	-- probs not using tick_behind
 	EGG_TICK_BEHIND = love.graphics.newImage("graphics/egg_tick_behind.png")
 	EGG_GREY_CENTER = love.graphics.newImage("graphics/egg_grey_center.png")
+	EGG_LIFE_CRACKED = love.graphics.newImage("graphics/egg_life_cracked.png")
+	EGG_LIFE_INTACT = love.graphics.newImage("graphics/egg_life_intact.png")
 	
 	TRASH_CAN = love.graphics.newImage("graphics/trash_can.png")
 	TRASH_SPRITE_MID = {x=64, y=66}
@@ -102,6 +104,7 @@ function love.load()
 	GRAVITY = 10
 	EGG_Y = 560
 	EGG_MAXFALL = 100
+	MAX_LIVES = 3
 	
 	click_highlights = {}  -- applicable for splash draw_cursor()
 	
@@ -158,6 +161,7 @@ function reset_game()
 	eggs_lost = 0
 	eggs_cleared = 0
 	loops_cleared = 0
+	lives = MAX_LIVES
 	
 	basket_eggs_set = {}
 	for i = 1, 6 do
@@ -305,11 +309,15 @@ function love.draw()
 			love.graphics.setColor(1, 1, 1, 1)
 		end
 	end
+	
+	-- trash
 	love.graphics.draw(
 		TRASH_CAN,
 		155 - TRASH_SPRITE_MID.x,
 		EGG_Y + EGG_MAXFALL - TRASH_SPRITE_MID.y
 	)
+	
+	-- basket
 	basket_x = 1180
 	basket_y = EGG_Y - 150
 	love.graphics.draw(BASKET_BACK, basket_x - BASKET_TOP_MID.x, basket_y - BASKET_TOP_MID.y)
@@ -318,15 +326,31 @@ function love.draw()
 	love.graphics.printf(#basket_eggs, basket_x - 50, basket_y - 45, 100, "center")
 	love.graphics.draw(BASKET_FRONT, basket_x - BASKET_TOP_MID.x, basket_y - BASKET_TOP_MID.y)
 	
+	-- lives
+	life_d_x = 780
+	life_d_y = 100
+	love.graphics.setFont(BASE_FONT)
+	love.graphics.printf("lives:", life_d_x, life_d_y + 20, 100, "center")
+	life_d_x = life_d_x + 100
+	for i = 1, MAX_LIVES do
+		if lives >= i then
+			love.graphics.draw(EGG_LIFE_INTACT, life_d_x, life_d_y)
+		else
+			love.graphics.draw(EGG_LIFE_CRACKED, life_d_x, life_d_y)
+		end
+		life_d_x = life_d_x + 50
+	end
+	
 	-- status gui
 	love.graphics.setColor(1, 1, 1)
 	love.graphics.setFont(BASE_FONT)
-	text_d_y = 150
-	love.graphics.print("eggs lost: " .. eggs_lost, 900, text_d_y)
+	text_d_x = 800
+	text_d_y = 200
+	love.graphics.print("eggs lost: " .. eggs_lost, text_d_x, text_d_y)
 	text_d_y = text_d_y + BASE_FONTSIZE * 1.25
-	love.graphics.print("eggs cleared: " .. eggs_cleared, 900, text_d_y)
+	love.graphics.print("eggs cleared: " .. eggs_cleared, text_d_x, text_d_y)
 	text_d_y = text_d_y + BASE_FONTSIZE * 1.25
-	love.graphics.print("loops cleared: " .. loops_cleared, 900, text_d_y)
+	love.graphics.print("loops cleared: " .. loops_cleared, text_d_x, text_d_y)
 	
 	-- mouse
 	draw_cursor()
@@ -401,6 +425,7 @@ function love.update(dt)
 			egg.y = egg.y + egg.vdown
 			if egg.y > EGG_Y + EGG_MAXFALL then
 				eggs_lost = eggs_lost + 1
+				lives = lives - 1
 				remove_first_egg()
 				event_msgs[#event_msgs + 1] = {str="egg failed!", col={1, 0.3, 0.3}}
 				DEAD_EGG:play()
