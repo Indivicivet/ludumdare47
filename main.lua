@@ -288,7 +288,8 @@ function love.draw()
 			"you can use WASD for tasks requiring arrow usage.",
 			"if not enough eggs are left to complete a task, you will get"
 			.. " free progress towards the task so it's possible.",
-			"when you clear a basket, you get a life back."
+			"when you clear a basket, you get a life back.",
+			"you can press \"m\" to toggle music."
 		}
 		draw_y = 600
 		for i, line in ipairs(footnote_lines) do
