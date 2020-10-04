@@ -165,7 +165,7 @@ function reset_game()
 	t = 0
 	eggs_lost = 0
 	eggs_cleared = 0
-	loops_cleared = 0
+	baskets_cleared = 0
 	lives = MAX_LIVES
 	
 	basket_eggs_set = {}
@@ -232,7 +232,7 @@ function draw_stats(offset_x, offset_y)
 	text_d_y = text_d_y + BASE_FONTSIZE * 1.25
 	love.graphics.print("eggs cleared: " .. eggs_cleared, text_d_x, text_d_y)
 	text_d_y = text_d_y + BASE_FONTSIZE * 1.25
-	love.graphics.print("loops cleared: " .. loops_cleared, text_d_x, text_d_y)
+	love.graphics.print("baskets cleared: " .. baskets_cleared, text_d_x, text_d_y)
 end
 
 function draw_cursor()
@@ -554,7 +554,7 @@ end
 function remove_first_egg()
 	table.remove(spawned_eggs, 1)
 	if #spawned_eggs == 0 and #basket_eggs == 0 then
-		loops_cleared = loops_cleared + 1
+		baskets_cleared = baskets_cleared + 1
 		if #tasks >= #task_queue then
 			-- ideally shouldn't hit this
 			screen = SCREEN.fadeout
