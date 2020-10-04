@@ -172,7 +172,7 @@ function reset_game()
 		{tasktype=TASK_TYPES.click_n_eggs, n=2},
 		{tasktype=TASK_TYPES.click_next_egg},
 		{tasktype=TASK_TYPES.click_next_egg},
-		{tasktype=TASK_TYPES.keyseq, seq={"down", "up"}},
+		{tasktype=TASK_TYPES.keyseq, seq={"up", "down"}},
 		{tasktype=TASK_TYPES.keyseq, seq={"left", "right"}},
 		{tasktype=TASK_TYPES.mash_keys, n=3},
 	}
