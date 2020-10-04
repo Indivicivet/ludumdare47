@@ -201,6 +201,17 @@ function reset_game()
 	conveyor_back_sound_t = 0
 end
 
+function draw_sprite(sprite, x, y)
+	-- mostly for eggs/other things which have non-int coords, otherwise
+	-- they get a weird alpha halo
+	love.graphics.draw(
+		sprite,
+		math.floor((x or 0) + 0.5),
+		math.floor((y or 0) + 0.5)
+	)
+end
+
+
 function draw_tasks(offset_x, offset_y)
 	-- used ingame and in scores screen
 	love.graphics.setFont(BASE_FONT)
@@ -261,7 +272,7 @@ function draw_cursor()
 		mouse_y = mouse_y + 4
 	end
 	love.graphics.setColor(1, 1, 1)
-	love.graphics.draw(CURSOR, mouse_x, mouse_y)
+	draw_sprite(CURSOR, mouse_x, mouse_y)
 end
 
 function love.draw()
@@ -269,7 +280,7 @@ function love.draw()
 	
 	if screen == SCREEN.splash or screen == SCREEN.scores then
 		slow_t = t / 4
-		love.graphics.draw(
+		draw_sprite(
 			BG_TITLE,
 			-50 + 80 * (-1 + math.sin(2 * slow_t)),
 			80 * (-1 + math.cos(3 * slow_t))
@@ -328,7 +339,7 @@ function love.draw()
 	
 	-- otherwise, we're ingame or fading out
 	love.graphics.setColor(1, 1, 1)
-	love.graphics.draw(BACKGROUND)
+	draw_sprite(BACKGROUND)
 	
 	-- tasks
 	draw_tasks()
@@ -349,7 +360,7 @@ function love.draw()
 	-- eggs fading out
 	for i, egg in ipairs(fadeout_eggs) do
 		love.graphics.setColor(1, 1, 1, egg.alpha or 0.95)
-		love.graphics.draw(
+		draw_sprite(
 			egg.eggtype.sprite,
 			egg.x - EGG_SPRITE_BOT.x,
 			egg.y - EGG_SPRITE_BOT.y
@@ -366,19 +377,19 @@ function love.draw()
 	
 	-- conveyor
 	conv_frame_num = math.floor(conveyor_t * CONVEYOR_SPEED / 4) % #CONVEYOR_FRAMES
-	love.graphics.draw(CONVEYOR_FRAMES[conv_frame_num], 210, EGG_Y - 5)
+	draw_sprite(CONVEYOR_FRAMES[conv_frame_num], 210, EGG_Y - 5)
 	love.graphics.setFont(BASE_FONT)
 	
 	-- eggs
 	for i, egg in ipairs(spawned_eggs) do
-		love.graphics.draw(
+		draw_sprite(
 			egg.eggtype.sprite,
 			egg.x - EGG_SPRITE_BOT.x,
 			egg.y - EGG_SPRITE_BOT.y
 		)
 		if current_task.hit_idxs and current_task.hit_idxs[i] then
 			love.graphics.setColor(1, 1, 1, 0.6)
-			love.graphics.draw(
+			draw_sprite(
 				EGG_GREY_CENTER,
 				egg.x - EGG_SPRITE_BOT.x,
 				egg.y - EGG_SPRITE_BOT.y
@@ -388,7 +399,7 @@ function love.draw()
 	end
 	
 	-- trash
-	love.graphics.draw(
+	draw_sprite(
 		TRASH_CAN,
 		155 - TRASH_SPRITE_MID.x,
 		EGG_Y + EGG_MAXFALL - TRASH_SPRITE_MID.y
@@ -397,11 +408,11 @@ function love.draw()
 	-- basket
 	basket_x = 1180
 	basket_y = EGG_Y - 150
-	love.graphics.draw(BASKET_BACK, basket_x - BASKET_TOP_MID.x, basket_y - BASKET_TOP_MID.y)
+	draw_sprite(BASKET_BACK, basket_x - BASKET_TOP_MID.x, basket_y - BASKET_TOP_MID.y)
 	love.graphics.setFont(HUGE_FONT)
 	love.graphics.setColor(1, 1, 1)
 	love.graphics.printf(#basket_eggs, basket_x - 50, basket_y - 45, 100, "center")
-	love.graphics.draw(BASKET_FRONT, basket_x - BASKET_TOP_MID.x, basket_y - BASKET_TOP_MID.y)
+	draw_sprite(BASKET_FRONT, basket_x - BASKET_TOP_MID.x, basket_y - BASKET_TOP_MID.y)
 	
 	-- lives
 	life_d_x = 780
@@ -411,9 +422,9 @@ function love.draw()
 	life_d_x = life_d_x + 100
 	for i = 1, MAX_LIVES do
 		if lives >= i then
-			love.graphics.draw(EGG_LIFE_INTACT, life_d_x, life_d_y)
+			draw_sprite(EGG_LIFE_INTACT, life_d_x, life_d_y)
 		else
-			love.graphics.draw(EGG_LIFE_CRACKED, life_d_x, life_d_y)
+			draw_sprite(EGG_LIFE_CRACKED, life_d_x, life_d_y)
 		end
 		life_d_x = life_d_x + 60
 	end
