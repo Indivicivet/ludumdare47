@@ -591,6 +591,8 @@ function setup_current_task()
 				complete_task()
 			end
 		end
+	elseif current_task.tasktype == TASK_TYPES.keyseq then
+		current_task.n = #current_task.seq
 	end
 end
 
@@ -719,14 +721,10 @@ function love.keypressed(key, scancode, isrepeat)
 	end
 	
 	if current_task.tasktype == TASK_TYPES.keyseq then
-		if current_task.progress == nil then
-			current_task.progress = 0
-			current_task.n = #current_task.seq
-		end
-		target_key = current_task.seq[current_task.progress + 1]
+		target_key = current_task.seq[(current_task.progress or 0) + 1]
 		target_wasd_key = WASD[target_key]
 		if key == target_key or key == target_wasd_key then
-			current_task.progress = current_task.progress + 1
+			current_task.progress = (current_task.progress or 0) + 1
 		end
 		if current_task.progress == current_task.n then
 			complete_task()
