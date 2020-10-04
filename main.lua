@@ -263,7 +263,7 @@ function love.draw()
 		-- splash screen
 		love.graphics.setColor(1, 1, 1)
 		love.graphics.setFont(TITLE_FONT)
-		love.graphics.printf("for egg in basket", 0, 240, WIDTH, "center")
+		love.graphics.printf("for egg in basket", 0, 200, WIDTH, "center")
 		love.graphics.setFont(BASE_FONT)
 		splash_lines = {
 			"you are tasked with quality assurance for",
@@ -282,7 +282,8 @@ function love.draw()
 		footnote_lines = {
 			"you can use WASD for tasks requiring arrow usage.",
 			"if not enough eggs are left to complete a task, you will get"
-			.. " free progress towards the task so it's possible."
+			.. " free progress towards the task so it's possible.",
+			"when you clear a basket, you get a life back."
 		}
 		draw_y = 600
 		for i, line in ipairs(footnote_lines) do
