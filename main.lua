@@ -489,6 +489,12 @@ function love.update(dt)
 		end
 	end
 	
+	for i, egg in ipairs(fadeout_eggs) do
+		egg.x = egg.x - CONVEYOR_SPEED * dt * 0.5
+		egg.vdown = egg.vdown + GRAVITY * dt
+		egg.y = egg.y + egg.vdown
+	end
+	
 	-- move eggs; first we block on the conveyor being active
 	if not conveyor_moving then
 		-- sound stuff
