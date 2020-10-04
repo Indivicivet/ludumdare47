@@ -329,6 +329,20 @@ function draw_cursor()
 	draw_sprite(CURSOR, mouse_x, mouse_y)
 end
 
+
+function draw_endgame_message(y)
+	-- for fadeout and for splash screen
+	love.graphics.setFont(HUGE_FONT)
+	if won then
+		love.graphics.setColor(0.3, 1, 0.4)
+		love.graphics.printf("congratulations!", 0, y, WIDTH, "center")
+	else
+		love.graphics.setColor(1, 0.3, 0.3)
+		love.graphics.printf("game over...", 0, y, WIDTH, "center")
+	end
+end
+
+
 function love.draw()
 	love.graphics.setBackgroundColor(0.25, 0.25, 0.3)
 	
@@ -380,9 +394,13 @@ function love.draw()
 	if screen == SCREEN.scores then
 		love.graphics.setFont(BIG_FONT)
 		love.graphics.setColor(1, 1, 1)
-		love.graphics.print("final loop:", 100, 150)
-		draw_tasks(50, 200)
-		draw_stats(0, 0)
+		love.graphics.print("final loop:", 50, 170)
+		draw_tasks(50, 250)
+		draw_stats(0, 50)
+		draw_endgame_message(50)
+		love.graphics.setColor(1, 1, 1)
+		love.graphics.setFont(BASE_FONT)
+		love.graphics.printf("click anywhere to play again", 0, 0, WIDTH, "center")
 		if fade_t < SCORE_FADEIN_TIME then
 			love.graphics.setColor(0, 0, 0, 1 - (fade_t / SCORE_FADEIN_TIME))
 			love.graphics.rectangle("fill", 0, 0, WIDTH, HEIGHT)
@@ -490,14 +508,7 @@ function love.draw()
 	if screen == SCREEN.fadeout then
 		love.graphics.setColor(0, 0, 0, fade_t/FADEOUT_TIME)
 		love.graphics.rectangle("fill", 0, 0, WIDTH, HEIGHT)
-		love.graphics.setFont(HUGE_FONT)
-		if won then
-			love.graphics.setColor(0.3, 1, 0.4)
-			love.graphics.printf("congratulations!", 0, 300, WIDTH, "center")
-		else
-			love.graphics.setColor(1, 0.3, 0.3)
-			love.graphics.printf("game over...", 0, 300, WIDTH, "center")
-		end
+		draw_endgame_message(300)
 	end
 	
 	-- mouse
