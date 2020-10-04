@@ -40,6 +40,7 @@ function love.load()
 	end
 	
 	BACKGROUND = love.graphics.newImage("graphics/background.png")
+	BG_TITLE = love.graphics.newImage("graphics/bg_title.png")
 	
 	-- probs not using tick_behind
 	EGG_TICK_BEHIND = love.graphics.newImage("graphics/egg_tick_behind.png")
@@ -123,6 +124,8 @@ function love.load()
 	MUSIC:setLooping(true)
 	MUSIC:play()
 	
+	t = 0
+	
 	-- for debug, skip splash screen:
 	--reset_game()
 end
@@ -172,7 +175,7 @@ function reset_game()
 	
 	spawned_eggs = {}
 	fadeout_eggs = {}
-	t = 0
+	
 	eggs_lost = 0
 	eggs_cleared = 0
 	baskets_cleared = 0
@@ -263,6 +266,15 @@ end
 
 function love.draw()
 	love.graphics.setBackgroundColor(0.25, 0.25, 0.3)
+	
+	if screen == SCREEN.splash or screen == SCREEN.scores then
+		slow_t = t / 4
+		love.graphics.draw(
+			BG_TITLE,
+			-50 + 80 * (-1 + math.sin(2 * slow_t)),
+			80 * (-1 + math.cos(3 * slow_t))
+		)
+	end
 	
 	if screen == SCREEN.splash then
 		-- splash screen
@@ -441,6 +453,8 @@ function spawn_egg()
 end
 
 function love.update(dt)
+	t = t + dt
+	
 	if screen == SCREEN.splash then
 		return
 	end
@@ -458,7 +472,6 @@ function love.update(dt)
 		end
 	end
 	
-	t = t + dt
 	if conveyor_moving then
 		conveyor_t = conveyor_t + dt
 	else
