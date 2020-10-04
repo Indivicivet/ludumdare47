@@ -105,7 +105,7 @@ function love.load()
 	
 	NEXT_EGG_TIME = 1.5
 	CONVEYOR_SPEED = 70
-	CONVEYOR_BACKSPEED_RATIO = 0.4
+	CONVEYOR_BACKSPEED_RATIO = 0.5
 	GRAVITY = 10
 	EGG_Y = 560
 	EGG_MAXFALL = 100
@@ -165,6 +165,8 @@ function reset_game()
 	-- picked, because is otherwise uniformly at random
 	EASY_TASKS = {
 		{tasktype=TASK_TYPES.click_egg},
+		{tasktype=TASK_TYPES.click_egg},
+		{tasktype=TASK_TYPES.click_egg},
 		{tasktype=TASK_TYPES.click_n_eggs, n=2},
 		{tasktype=TASK_TYPES.keyseq, seq={"left"}},
 		{tasktype=TASK_TYPES.keyseq, seq={"down", "up"}},
@@ -180,28 +182,34 @@ function reset_game()
 		{tasktype=TASK_TYPES.click_any_xcol, col="blue"},
 		{tasktype=TASK_TYPES.click_any_xcol, col="green"},
 		{tasktype=TASK_TYPES.keyseq, seq={"up", "left", "down"}},
-		{tasktype=TASK_TYPES.keyseq, seq={"up", "left", "up", "down"}},
-		{tasktype=TASK_TYPES.mash_keys, n=5},
+		{tasktype=TASK_TYPES.keyseq, seq={"left", "left", "left"}},
+		{tasktype=TASK_TYPES.keyseq, seq={"down", "down", "down"}},
 		{tasktype=TASK_TYPES.click_n_eggs, n=3},
+		{tasktype=TASK_TYPES.mash_keys, n=5},
 	}
 	
 	HARD_TASKS = {
-		{tasktype=TASK_TYPES.keyseq, seq={"up", "down", "up", "down", "left"}},
-		{tasktype=TASK_TYPES.keyseq, seq={"left", "down", "left", "down", "up"}},
+		{tasktype=TASK_TYPES.keyseq, seq={"up", "left", "up", "down"}},
+		{tasktype=TASK_TYPES.keyseq, seq={"right", "left", "up", "down"}},
+		{tasktype=TASK_TYPES.keyseq, seq={"down", "down", "right", "right"}},
+		{tasktype=TASK_TYPES.keyseq, seq={"up", "down", "up", "down", "right"}},
+		{tasktype=TASK_TYPES.keyseq, seq={"down", "left", "left", "up", "left"}},
+		{tasktype=TASK_TYPES.keyseq, seq={"left", "down", "left", "down", "left"}},
 		{tasktype=TASK_TYPES.keyseq, seq={"up", "down", "left", "right", "up"}},
 		{tasktype=TASK_TYPES.mash_keys, n=15},
 		{tasktype=TASK_TYPES.click_n_eggs, n=4},
 		{tasktype=TASK_TYPES.keyseq, seq={
-			"up", "up", "down", "down", "left", "right", "left", "right"
+			"up", "up", "down", "down", "left", "right", "left", "right", "a", "b"
 		}},
 	}
 	
 	task_queue = {}
 	task_queue[1] = {tasktype=TASK_TYPES.click_egg}
 	for i = 2, MAX_TASKS do
+		-- egg, easy, easy, med, easy, med, easy, hard, easy, med, easy, hard
 		if i <= 3 or (i % 2 == 1) then
 			task_queue[i] = pop_random(EASY_TASKS)
-		elseif i <= 7 then
+		elseif i <= 6 or i == 10 then
 			task_queue[i] = pop_random(MEDIUM_TASKS)
 		else
 			task_queue[i] = pop_random(HARD_TASKS)
@@ -271,7 +279,7 @@ function draw_tasks(offset_x, offset_y)
 		if not (task.tasktype.fmt_arrowseq == nil) then
 			arr_str = ""
 			for j, dir in ipairs(task.seq) do
-				arr_str = arr_str .. ARROW_CHARS[dir]
+				arr_str = arr_str .. (ARROW_CHARS[dir] or dir)
 			end
 			task_str = task_str:format(arr_str)
 		end
@@ -683,10 +691,8 @@ function remove_first_egg()
 			return
 		end
 		tasks[#tasks + 1] = task_queue[#tasks + 1]
-		if eggs_per_basket < 8 then
+		if #tasks < 6 or (#tasks % 2 == 0) then
 			eggs_per_basket = eggs_per_basket + 1 -- was 2 but was 2hard.
-		else
-			eggs_per_basket = eggs_per_basket + 1
 		end
 		basket_eggs = new_basket(eggs_per_basket)
 		event_msgs[#event_msgs + 1] = {str="basket cleared!", col={0.3, 1, 0.4}}
