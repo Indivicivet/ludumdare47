@@ -168,36 +168,42 @@ function reset_game()
 		{tasktype=TASK_TYPES.click_egg},
 		{tasktype=TASK_TYPES.click_egg},
 		{tasktype=TASK_TYPES.click_n_eggs, n=2},
-		{tasktype=TASK_TYPES.keyseq, seq={"left"}},
+		{tasktype=TASK_TYPES.click_next_egg},
+		{tasktype=TASK_TYPES.click_next_egg},
 		{tasktype=TASK_TYPES.keyseq, seq={"down", "up"}},
 		{tasktype=TASK_TYPES.keyseq, seq={"left", "right"}},
 		{tasktype=TASK_TYPES.mash_keys, n=3},
-		{tasktype=TASK_TYPES.click_next_egg},
-		{tasktype=TASK_TYPES.click_next_egg},
 	}
 	
 	MEDIUM_TASKS = {
+		{tasktype=TASK_TYPES.click_next_egg},
 		{tasktype=TASK_TYPES.click_any_striped},
+		{tasktype=TASK_TYPES.click_n_eggs, n=2},
 		{tasktype=TASK_TYPES.click_any_xcol, col="red"},
 		{tasktype=TASK_TYPES.click_any_xcol, col="blue"},
 		{tasktype=TASK_TYPES.click_any_xcol, col="green"},
 		{tasktype=TASK_TYPES.keyseq, seq={"up", "left", "down"}},
 		{tasktype=TASK_TYPES.keyseq, seq={"left", "left", "left"}},
 		{tasktype=TASK_TYPES.keyseq, seq={"down", "down", "down"}},
-		{tasktype=TASK_TYPES.click_n_eggs, n=3},
 		{tasktype=TASK_TYPES.mash_keys, n=5},
 	}
 	
 	HARD_TASKS = {
-		{tasktype=TASK_TYPES.keyseq, seq={"up", "left", "up", "down"}},
-		{tasktype=TASK_TYPES.keyseq, seq={"right", "left", "up", "down"}},
+		{tasktype=TASK_TYPES.click_n_eggs, n=3},
+		{tasktype=TASK_TYPES.click_n_eggs, n=3},
+		{tasktype=TASK_TYPES.keyseq, seq={"up", "left", "down", "right"}},
+		{tasktype=TASK_TYPES.keyseq, seq={"up", "right", "down", "left"}},
 		{tasktype=TASK_TYPES.keyseq, seq={"down", "down", "right", "right"}},
-		{tasktype=TASK_TYPES.keyseq, seq={"up", "down", "up", "down", "right"}},
-		{tasktype=TASK_TYPES.keyseq, seq={"down", "left", "left", "up", "left"}},
+		{tasktype=TASK_TYPES.keyseq, seq={"up", "down", "up", "down", "up"}},
+		{tasktype=TASK_TYPES.keyseq, seq={"down", "left", "left", "right", "left"}},
 		{tasktype=TASK_TYPES.keyseq, seq={"left", "down", "left", "down", "left"}},
 		{tasktype=TASK_TYPES.keyseq, seq={"up", "down", "left", "right", "up"}},
-		{tasktype=TASK_TYPES.mash_keys, n=15},
+		{tasktype=TASK_TYPES.mash_keys, n=10},
+	}
+	
+	FINALE_TASKS = {
 		{tasktype=TASK_TYPES.click_n_eggs, n=4},
+		{tasktype=TASK_TYPES.mash_keys, n=20},
 		{tasktype=TASK_TYPES.keyseq, seq={
 			"up", "up", "down", "down", "left", "right", "left", "right", "a", "b"
 		}},
@@ -206,13 +212,15 @@ function reset_game()
 	task_queue = {}
 	task_queue[1] = {tasktype=TASK_TYPES.click_egg}
 	for i = 2, MAX_TASKS do
-		-- egg, easy, easy, med, easy, med, easy, hard, easy, med, easy, hard
+		-- egg, easy, easy, med, easy, med, easy, hard, easy, med, easy, finale
 		if i <= 3 or (i % 2 == 1) then
 			task_queue[i] = pop_random(EASY_TASKS)
 		elseif i <= 6 or i == 10 then
 			task_queue[i] = pop_random(MEDIUM_TASKS)
-		else
+		elseif i < MAX_TASKS then
 			task_queue[i] = pop_random(HARD_TASKS)
+		else
+			task_queue[i] = pop_random(FINALE_TASKS)
 		end
 	end
 	
