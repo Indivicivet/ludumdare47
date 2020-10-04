@@ -710,8 +710,8 @@ function remove_first_egg()
 			return
 		end
 		tasks[#tasks + 1] = task_queue[#tasks + 1]
-		if #tasks < 6 or (#tasks % 2 == 0) then
-			eggs_per_basket = eggs_per_basket + 1 -- was 2 but was 2hard.
+		if #tasks <= 5 or (#tasks % 2 == 1) then
+			eggs_per_basket = eggs_per_basket + 1
 		end
 		basket_eggs = new_basket(eggs_per_basket)
 		event_msgs[#event_msgs + 1] = {str="basket cleared!", col={0.3, 1, 0.4}}
